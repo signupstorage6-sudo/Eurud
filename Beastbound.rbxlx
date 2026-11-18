@@ -1,0 +1,3547 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4"><Meta name="ExplicitAutoJoints">true</Meta><Item class="Workspace" referent="RBX10"><Properties><string name="Name">Workspace</string></Properties><Item class="Terrain" referent="RBX9"><Properties><string name="Name">Terrain</string></Properties></Item></Item><Item class="ReplicatedStorage" referent="RBX13"><Properties><string name="Name">ReplicatedStorage</string></Properties><Item class="ModuleScript" referent="RBX11"><Properties><string name="Name">Config</string><ProtectedString name="Source"><![CDATA[-- Config (ModuleScript) | ReplicatedStorage.Config
+local C = {}
+
+C.Rarities = {
+	Common = {order = 1, color = Color3.fromRGB(200, 200, 200)},
+	Uncommon = {order = 2, color = Color3.fromRGB(90, 225, 90)},
+	Rare = {order = 3, color = Color3.fromRGB(70, 140, 255)},
+	Epic = {order = 4, color = Color3.fromRGB(175, 85, 255)},
+	Legendary = {order = 5, color = Color3.fromRGB(255, 190, 40)},
+	Mythical = {order = 6, color = Color3.fromRGB(255, 70, 120)},
+	Divine = {order = 7, color = Color3.fromRGB(255, 250, 170)},
+	Exclusive = {order = 8, color = Color3.fromRGB(0, 255, 230)},
+	Titanic = {order = 9, color = Color3.fromRGB(255, 60, 60)}, -- label only, NOT a tier
+}
+
+-- dmg = final damage per hit (1 hit / second / pet)
+C.Pets = {
+	StarterDino = {kind = "Dino", rarity = "Common", dmg = 5, display = "Starter Dino"},
+	StarterDragon = {kind = "Dragon", rarity = "Common", dmg = 5, display = "Starter Dragon"},
+
+	Velociraptor = {kind = "Dino", rarity = "Common", dmg = 5, egg = "AncientPlains"},
+	Triceratops = {kind = "Dino", rarity = "Common", dmg = 6, egg = "AncientPlains"},
+	Stegosaurus = {kind = "Dino", rarity = "Uncommon", dmg = 7, egg = "AncientPlains"},
+	Ankylosaurus = {kind = "Dino", rarity = "Rare", dmg = 8, egg = "AncientPlains"},
+	FireDrake = {kind = "Dragon", rarity = "Epic", dmg = 10, egg = "AncientPlains", display = "Fire Drake"},
+
+	Dilophosaurus = {kind = "Dino", rarity = "Common", dmg = 18, egg = "JurassicJungle"},
+	Carnotaurus = {kind = "Dino", rarity = "Uncommon", dmg = 20, egg = "JurassicJungle"},
+	Brachiosaurus = {kind = "Dino", rarity = "Rare", dmg = 23, egg = "JurassicJungle"},
+	ToxicDragon = {kind = "Dragon", rarity = "Epic", dmg = 27, egg = "JurassicJungle", display = "Toxic Dragon"},
+	TRex = {kind = "Dino", rarity = "Legendary", dmg = 32, egg = "JurassicJungle", display = "T-Rex"},
+
+	IceDragon = {kind = "Dragon", rarity = "Uncommon", dmg = 55, egg = "FrozenTundra", display = "Ice Dragon"},
+	Therizinosaurus = {kind = "Dino", rarity = "Rare", dmg = 62, egg = "FrozenTundra"},
+	Spinosaurus = {kind = "Dino", rarity = "Epic", dmg = 70, egg = "FrozenTundra"},
+	StormDragon = {kind = "Dragon", rarity = "Legendary", dmg = 82, egg = "FrozenTundra", display = "Storm Dragon"},
+
+	Giganotosaurus = {kind = "Dino", rarity = "Rare", dmg = 150, egg = "DragonMountains"},
+	ThunderDragon = {kind = "Dragon", rarity = "Epic", dmg = 175, egg = "DragonMountains", display = "Thunder Dragon"},
+	RoyalDragon = {kind = "Dragon", rarity = "Legendary", dmg = 210, egg = "DragonMountains", display = "Royal Dragon"},
+	IndominusRex = {kind = "Dino", rarity = "Mythical", dmg = 260, egg = "DragonMountains", display = "Indominus Rex"},
+
+	InfernoDragon = {kind = "Dragon", rarity = "Epic", dmg = 420, egg = "VolcanicWasteland", display = "Inferno Dragon"},
+	MagmaRex = {kind = "Dino", rarity = "Legendary", dmg = 500, egg = "VolcanicWasteland", display = "Magma Rex"},
+	AncientDragon = {kind = "Dragon", rarity = "Mythical", dmg = 600, egg = "VolcanicWasteland", display = "Ancient Dragon"},
+
+	CrystalDragon = {kind = "Dragon", rarity = "Epic", dmg = 900, egg = "CrystalCaverns", display = "Crystal Dragon"},
+	GeodeSaurus = {kind = "Dino", rarity = "Legendary", dmg = 1050, egg = "CrystalCaverns", display = "Geodesaurus"},
+	PrismWyrm = {kind = "Dragon", rarity = "Mythical", dmg = 1250, egg = "CrystalCaverns", display = "Prism Wyrm"},
+
+	ShadowDragon = {kind = "Dragon", rarity = "Legendary", dmg = 2000, egg = "ShadowRealm", display = "Shadow Dragon"},
+	PhantomRaptor = {kind = "Dino", rarity = "Mythical", dmg = 2500, egg = "ShadowRealm", display = "Phantom Raptor"},
+	VoidDragon = {kind = "Dragon", rarity = "Divine", dmg = 3100, egg = "ShadowRealm", display = "Void Dragon"},
+
+	CelestialDragon = {kind = "Dragon", rarity = "Mythical", dmg = 5000, egg = "CelestialKingdom", display = "Celestial Dragon"},
+	AngelSaurus = {kind = "Dino", rarity = "Divine", dmg = 6200, egg = "CelestialKingdom", display = "Angelsaurus"},
+	SolarWyrm = {kind = "Dragon", rarity = "Exclusive", dmg = 7800, egg = "CelestialKingdom", display = "Solar Wyrm"},
+
+	ElderDragon = {kind = "Dragon", rarity = "Divine", dmg = 11000, egg = "DragonSanctuary", display = "Elder Dragon"},
+	SanctuaryRex = {kind = "Dino", rarity = "Exclusive", dmg = 14500, egg = "DragonSanctuary", display = "Sanctuary Rex"},
+
+	PrimalRaptor = {kind = "Dino", rarity = "Divine", dmg = 25000, egg = "PrimalDimension", display = "Primal Raptor"},
+	ChronoDragon = {kind = "Dragon", rarity = "Exclusive", dmg = 33000, egg = "PrimalDimension", display = "Chrono Dragon"},
+
+	-- TITANICS: exactly three. Separate hatchable pets, not a rarity tier.
+	TitanicVoidWyrm = {kind = "Dragon", rarity = "Titanic", titanic = true, dmg = 400000, egg = "ShadowRealm", display = "Titanic Void Wyrm"},
+	TitanicCelestialDrake = {kind = "Dragon", rarity = "Titanic", titanic = true, dmg = 1300000, egg = "DragonSanctuary", display = "Titanic Celestial Drake"},
+	TitanicApexRex = {kind = "Dino", rarity = "Titanic", titanic = true, dmg = 4500000, egg = "PrimalDimension", display = "Titanic Apex Rex"},
+}
+for name, p in pairs(C.Pets) do
+	p.display = p.display or name
+	p.name = name
+end
+
+-- odds are in PERCENT (each egg sums to 100)
+-- Titanic odds: 0.00002% = 1 in 5,000,000 | 0.00001% = 1 in 10,000,000 | 0.000005% = 1 in 20,000,000
+C.Eggs = {
+	AncientPlains = {display = "Ancient Plains Egg", price = 100, area = 1, odds = {{"Velociraptor", 50}, {"Triceratops", 30}, {"Stegosaurus", 14}, {"Ankylosaurus", 5}, {"FireDrake", 1}}},
+	JurassicJungle = {display = "Jurassic Jungle Egg", price = 1500, area = 2, odds = {{"Dilophosaurus", 50}, {"Carnotaurus", 28}, {"Brachiosaurus", 15}, {"ToxicDragon", 6}, {"TRex", 1}}},
+	FrozenTundra = {display = "Frozen Tundra Egg", price = 12000, area = 3, odds = {{"IceDragon", 45}, {"Therizinosaurus", 32}, {"Spinosaurus", 18}, {"StormDragon", 5}}},
+	DragonMountains = {display = "Dragon Mountains Egg", price = 80000, area = 4, odds = {{"Giganotosaurus", 50}, {"ThunderDragon", 30}, {"RoyalDragon", 16}, {"IndominusRex", 4}}},
+	VolcanicWasteland = {display = "Volcanic Egg", price = 500000, area = 5, odds = {{"InfernoDragon", 50}, {"MagmaRex", 38}, {"AncientDragon", 12}}},
+	CrystalCaverns = {display = "Crystal Egg", price = 3000000, area = 6, odds = {{"CrystalDragon", 50}, {"GeodeSaurus", 38}, {"PrismWyrm", 12}}},
+	ShadowRealm = {display = "Shadow Egg", price = 20000000, area = 7, odds = {{"ShadowDragon", 55}, {"PhantomRaptor", 33}, {"VoidDragon", 11.99998}, {"TitanicVoidWyrm", 0.00002}}},
+	CelestialKingdom = {display = "Celestial Egg", price = 150000000, area = 8, odds = {{"CelestialDragon", 55}, {"AngelSaurus", 33}, {"SolarWyrm", 12}}},
+	DragonSanctuary = {display = "Sanctuary Egg", price = 1000000000, area = 9, odds = {{"ElderDragon", 70}, {"SanctuaryRex", 29.99999}, {"TitanicCelestialDrake", 0.00001}}},
+	PrimalDimension = {display = "Primal Egg", price = 8000000000, area = 10, odds = {{"PrimalRaptor", 70}, {"ChronoDragon", 29.999995}, {"TitanicApexRex", 0.000005}}},
+}
+for id, e in pairs(C.Eggs) do e.id = id end
+
+C.EggOrder = {"AncientPlains", "JurassicJungle", "FrozenTundra", "DragonMountains", "VolcanicWasteland", "CrystalCaverns", "ShadowRealm", "CelestialKingdom", "DragonSanctuary", "PrimalDimension"}
+
+-- enemies: {name, archetype, tier}; theme colors/materials; light = lighting profile for the client
+C.Areas = {
+	{name = "Ancient Plains", egg = "AncientPlains", cost = 0, hp = 50, reward = 10,
+		theme = {c1 = Color3.fromRGB(150, 140, 120), c2 = Color3.fromRGB(110, 190, 80), mat = Enum.Material.Slate, glow = Color3.fromRGB(255, 220, 120)},
+		enemies = {{"Mossy Golem", "Golem", 1}, {"Dust Hopper", "Beast", 2}, {"Bone Crawler", "Beast", 3}, {"Plains Titan", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(120, 125, 140), fog = Color3.fromRGB(200, 225, 255), fogEnd = 900, clock = 14, bright = 2.4}},
+	{name = "Jurassic Jungle", egg = "JurassicJungle", cost = 1000, hp = 400, reward = 80,
+		theme = {c1 = Color3.fromRGB(70, 120, 60), c2 = Color3.fromRGB(150, 220, 90), mat = Enum.Material.Mud, glow = Color3.fromRGB(180, 255, 100)},
+		enemies = {{"Vine Golem", "Golem", 1}, {"Swamp Brute", "Beast", 2}, {"Spore Wisp", "Elemental", 3}, {"Jungle Colossus", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(70, 110, 80), fog = Color3.fromRGB(120, 170, 110), fogEnd = 450, clock = 11, bright = 2},
+	},
+	{name = "Frozen Tundra", egg = "FrozenTundra", cost = 9000, hp = 3000, reward = 600,
+		theme = {c1 = Color3.fromRGB(170, 215, 240), c2 = Color3.fromRGB(235, 250, 255), mat = Enum.Material.Ice, glow = Color3.fromRGB(120, 220, 255)},
+		enemies = {{"Frost Golem", "Golem", 1}, {"Snow Stalker", "Beast", 2}, {"Blizzard Wisp", "Elemental", 3}, {"Glacier Giant", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(140, 160, 190), fog = Color3.fromRGB(215, 235, 255), fogEnd = 500, clock = 12, bright = 2.6}},
+	{name = "Dragon Mountains", egg = "DragonMountains", cost = 60000, hp = 20000, reward = 4000,
+		theme = {c1 = Color3.fromRGB(105, 105, 120), c2 = Color3.fromRGB(190, 190, 205), mat = Enum.Material.Granite, glow = Color3.fromRGB(255, 170, 80)},
+		enemies = {{"Cliff Golem", "Golem", 1}, {"Mountain Ram", "Beast", 2}, {"Wind Elemental", "Elemental", 3}, {"Peak Warden", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(130, 135, 160), fog = Color3.fromRGB(170, 185, 215), fogEnd = 700, clock = 16, bright = 2.3}},
+	{name = "Volcanic Wasteland", egg = "VolcanicWasteland", cost = 400000, hp = 150000, reward = 30000,
+		theme = {c1 = Color3.fromRGB(45, 35, 35), c2 = Color3.fromRGB(255, 110, 30), mat = Enum.Material.Basalt, glow = Color3.fromRGB(255, 90, 20)},
+		enemies = {{"Magma Golem", "Golem", 1}, {"Ash Hound", "Beast", 2}, {"Flame Spirit", "Elemental", 3}, {"Lava Behemoth", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(150, 70, 50), fog = Color3.fromRGB(120, 50, 30), fogEnd = 380, clock = 17.5, bright = 1.6}},
+	{name = "Crystal Caverns", egg = "CrystalCaverns", cost = 2500000, hp = 1000000, reward = 200000,
+		theme = {c1 = Color3.fromRGB(110, 90, 170), c2 = Color3.fromRGB(120, 230, 255), mat = Enum.Material.Slate, glow = Color3.fromRGB(150, 240, 255)},
+		enemies = {{"Gem Golem", "Golem", 1}, {"Shard Crawler", "Beast", 2}, {"Prism Wisp", "Elemental", 3}, {"Crystal Tyrant", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(90, 90, 170), fog = Color3.fromRGB(60, 60, 130), fogEnd = 420, clock = 0, bright = 0.6}},
+	{name = "Shadow Realm", egg = "ShadowRealm", cost = 15000000, hp = 8000000, reward = 1500000,
+		theme = {c1 = Color3.fromRGB(35, 28, 50), c2 = Color3.fromRGB(150, 60, 220), mat = Enum.Material.Slate, glow = Color3.fromRGB(190, 70, 255)},
+		enemies = {{"Shade Golem", "Golem", 1}, {"Night Prowler", "Beast", 2}, {"Soul Wisp", "Elemental", 3}, {"Umbral Overlord", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(60, 40, 90), fog = Color3.fromRGB(30, 20, 50), fogEnd = 300, clock = 0, bright = 0.3}},
+	{name = "Celestial Kingdom", egg = "CelestialKingdom", cost = 120000000, hp = 60000000, reward = 12000000,
+		theme = {c1 = Color3.fromRGB(245, 240, 225), c2 = Color3.fromRGB(255, 215, 90), mat = Enum.Material.Marble, glow = Color3.fromRGB(255, 240, 160)},
+		enemies = {{"Marble Guardian", "Golem", 1}, {"Cloud Stag", "Beast", 2}, {"Star Wisp", "Elemental", 3}, {"Seraph Sentinel", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(190, 180, 210), fog = Color3.fromRGB(255, 235, 215), fogEnd = 800, clock = 18.2, bright = 3}},
+	{name = "Ancient Dragon Sanctuary", egg = "DragonSanctuary", cost = 800000000, hp = 400000000, reward = 80000000,
+		theme = {c1 = Color3.fromRGB(150, 125, 90), c2 = Color3.fromRGB(240, 190, 70), mat = Enum.Material.Limestone, glow = Color3.fromRGB(255, 180, 60)},
+		enemies = {{"Ruin Golem", "Golem", 1}, {"Temple Drake", "Beast", 2}, {"Ember Wisp", "Elemental", 3}, {"Sanctuary Colossus", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(150, 120, 100), fog = Color3.fromRGB(230, 170, 120), fogEnd = 550, clock = 19, bright = 2}},
+	{name = "Primal Dimension", egg = "PrimalDimension", cost = 6000000000, hp = 3000000000, reward = 600000000,
+		theme = {c1 = Color3.fromRGB(90, 45, 70), c2 = Color3.fromRGB(255, 120, 200), mat = Enum.Material.Basalt, glow = Color3.fromRGB(255, 130, 60)},
+		enemies = {{"Primal Golem", "Golem", 1}, {"Chaos Beast", "Beast", 2}, {"Rift Wisp", "Elemental", 3}, {"Dimension Devourer", "Boss", 4}},
+		light = {ambient = Color3.fromRGB(150, 70, 140), fog = Color3.fromRGB(120, 40, 110), fogEnd = 450, clock = 21, bright = 1.2}},
+}
+C.TierMult = {1, 2.5, 6, 25}
+C.TierRespawn = {12, 15, 22, 45}
+
+C.World = {Ring = 760, AreaRadius = 230, SpawnRadius = 115, GateRadius = 520}
+function C.AreaCenter(i)
+	local a = math.rad((i - 1) * 36 - 90)
+	return Vector3.new(math.cos(a) * C.World.Ring, 0, math.sin(a) * C.World.Ring)
+end
+
+C.MaxEquipped = 4
+C.HitInterval = 1.0
+C.AttackRange = 170
+
+-- built-in Roblox sounds (swap any for your own rbxassetid:// ids)
+C.Sounds = {
+	Buy = "rbxasset://sounds/electronicpingshort.wav",
+	Crack = "rbxasset://sounds/impact_water.mp3",
+	Hatch = "rbxasset://sounds/impact_explosion_03.mp3",
+	Rare = "rbxasset://sounds/victory.wav",
+	Hit = "rbxasset://sounds/swordslash.wav",
+	Defeat = "rbxasset://sounds/splat.wav",
+	Coin = "rbxasset://sounds/snap.mp3",
+	Unlock = "rbxasset://sounds/victory.wav",
+	Titanic = "rbxasset://sounds/impact_explosion_03.mp3",
+	Mount = "rbxasset://sounds/bass.wav",
+	Flap = "rbxasset://sounds/swordslash.wav",
+	Stomp = "rbxasset://sounds/impact_explosion_03.mp3",
+	Click = "rbxasset://sounds/clickfast.wav",
+}
+C.MusicId = "" -- optional: put rbxassetid://... here; Settings > Music slider controls it
+
+function C.GetDamage(name) return C.Pets[name].dmg end
+
+function C.Format(n)
+	n = math.floor(n + 0.5)
+	if n < 10000 then
+		local s = tostring(n)
+		return (s:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", ""))
+	end
+	local suf = {"", "K", "M", "B", "T", "Qa"}
+	local i = 1
+	local v = n
+	while v >= 1000 and i < #suf do v = v / 1000 i = i + 1 end
+	return string.format(v >= 100 and "%.0f%s" or (v >= 10 and "%.1f%s" or "%.2f%s"), v, suf[i])
+end
+
+function C.OddsText(pct)
+	if pct >= 1 then return string.format("%.4g%%", pct) end
+	local inv = 100 / pct
+	return string.format("1 in %s", C.Format(inv))
+end
+
+return C
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX12"><Properties><string name="Name">ModelBuilder</string><ProtectedString name="Source"><![CDATA[-- ModelBuilder (ModuleScript) | ReplicatedStorage.ModelBuilder
+-- Builds every creature from rounded parts joined with Motor6D so they can be animated procedurally.
+-- Pet models face -Z. Root is the body centre. Attribute "Drop" = studs from Root to the ground.
+local M = {}
+local SM = Enum.Material.SmoothPlastic
+local V, CF, A = Vector3.new, CFrame.new, CFrame.Angles
+local function T(x, y, z, rx, ry, rz) return CF(x, y, z) * A(rx or 0, ry or 0, rz or 0) end
+local function mix(a, b, t) return a:Lerp(b, t) end
+local WHITE, BLACK = Color3.new(1, 1, 1), Color3.new(0, 0, 0)
+
+---------------------------------------------------------------- builder core
+local B = {}
+B.__index = B
+
+local function newPart(model, name, size, color, mat, kind)
+	local p = Instance.new(kind == "Wedge" and "WedgePart" or "Part")
+	p.Name = name
+	p.Size = size
+	p.Color = color
+	p.Material = mat or SM
+	p.Anchored = false
+	p.CanCollide = false
+	p.CanTouch = false
+	p.CanQuery = false
+	p.Massless = true
+	p.TopSurface = Enum.SurfaceType.Smooth
+	p.BottomSurface = Enum.SurfaceType.Smooth
+	if kind == "Ball" then
+		local m = Instance.new("SpecialMesh")
+		m.MeshType = Enum.MeshType.Sphere
+		m.Parent = p
+	elseif kind == "Cyl" then
+		p.Shape = Enum.PartType.Cylinder
+	end
+	p.Parent = model
+	return p
+end
+
+local function newBuilder(name, scale)
+	local self = setmetatable({}, B)
+	self.model = Instance.new("Model")
+	self.model.Name = name
+	self.S = scale
+	self.parts = {}
+	self.joints = {}
+	self.trans = 0
+	return self
+end
+
+function B:root(size, color, mat)
+	local p = newPart(self.model, "Root", size * self.S, color, mat, "Ball")
+	p.CFrame = CF()
+	self.parts.Root = p
+	self.model.PrimaryPart = p
+	return p
+end
+
+-- name, parent name, kind (Ball/Block/Cyl/Wedge), size, c0 (design units), pivot (child-local point on the joint), colour, material
+function B:add(name, parent, kind, size, c0, pivot, color, mat, transp)
+	local S = self.S
+	local p = newPart(self.model, name, size * S, color, mat, kind)
+	local t = transp or self.trans
+	if t > 0 then p.Transparency = t end
+	local c0s = CF(c0.Position * S) * (c0 - c0.Position)
+	local pv = (pivot or Vector3.zero) * S
+	local par = self.parts[parent]
+	local m = Instance.new("Motor6D")
+	m.Name = name
+	m.Part0 = par
+	m.Part1 = p
+	m.C0 = c0s
+	m.C1 = CF(pv)
+	m.Parent = par
+	p.CFrame = par.CFrame * c0s * CF(pv):Inverse()
+	self.parts[name] = p
+	self.joints[name] = m
+	return p
+end
+
+---------------------------------------------------------------- shared decorations
+local function eyes(b, parent, hs, color, x, y, z)
+	for _, s in ipairs({-1, 1}) do
+		b:add(s < 0 and "EyeL" or "EyeR", parent, "Ball", V(0.15, 0.15, 0.15) * hs, T(s * x * hs, y * hs, z * hs), nil, color, Enum.Material.Neon, 0)
+	end
+end
+
+local function horns(b, parent, hs, n, color, len, x, y, z, sweep)
+	for i = 1, n do
+		for _, s in ipairs({-1, 1}) do
+			local nm = (s < 0 and "HornL" or "HornR") .. i
+			b:add(nm, parent, "Ball", V(0.11, len, 0.11) * hs, T(s * (x + (i - 1) * 0.1) * hs, (y + (i - 1) * 0.05) * hs, (z + (i - 1) * 0.28) * hs, sweep or 0.7, 0, s * 0.25), V(0, -len / 2, 0), color)
+		end
+	end
+end
+
+local function tail(b, parent, n, len, w, color, startC0, tipColor)
+	local prev = parent
+	local c0 = startC0
+	for i = 1, n do
+		local f = 1 - (i - 1) / (n + 0.6)
+		local l = len * (0.85 + 0.15 * f)
+		b:add("Tail" .. i, prev, "Ball", V(w * f, w * f * 0.9, l), c0, V(0, 0, -l / 2), (i == n and tipColor) or color)
+		prev = "Tail" .. i
+		c0 = T(0, 0, l / 2, 0, 0, 0)
+	end
+	return prev
+end
+
+local function leg(b, side, parentName, nameSuffix, px, py, pz, th, sh, w, color, footColor, toes)
+	local sn = side < 0 and "L" or "R"
+	b:add("Thigh" .. nameSuffix .. sn, parentName, "Ball", V(w, th, w * 1.2), T(side * px, py, pz), V(0, th * 0.45, 0), color)
+	b:add("Shin" .. nameSuffix .. sn, "Thigh" .. nameSuffix .. sn, "Ball", V(w * 0.55, sh, w * 0.6), T(0, -th * 0.42, -0.05, -0.35), V(0, sh * 0.45, 0), color)
+	b:add("Foot" .. nameSuffix .. sn, "Shin" .. nameSuffix .. sn, "Ball", V(w * 0.8, 0.18, w * 1.5), T(0, -sh * 0.45, -w * 0.4, 0.35), nil, footColor)
+	if toes then
+		b:add("Claw" .. nameSuffix .. sn, "Foot" .. nameSuffix .. sn, "Ball", V(w * 0.5, 0.1, 0.3), T(0, 0, -w * 0.85), nil, WHITE)
+	end
+	return th * 0.87 + sh * 0.85 + 0.09
+end
+
+local function aura(model, color, rate, size, speed)
+	local pe = Instance.new("ParticleEmitter")
+	pe.Color = ColorSequence.new(color)
+	pe.Rate = rate
+	pe.Lifetime = NumberRange.new(1, 2)
+	pe.Speed = NumberRange.new(speed or 2, (speed or 2) * 2)
+	pe.SpreadAngle = Vector2.new(180, 180)
+	pe.LightEmission = 0.8
+	pe.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, size), NumberSequenceKeypoint.new(1, 0)})
+	pe.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.2), NumberSequenceKeypoint.new(1, 1)})
+	pe.Parent = model.PrimaryPart
+	return pe
+end
+
+---------------------------------------------------------------- DINOSAURS
+local function biped(b, L)
+	local c1 = L.c1
+	local c2 = L.c2 or mix(c1, WHITE, 0.5)
+	local c3 = L.c3 or mix(c1, BLACK, 0.45)
+	local bw = L.bulk or 1
+	local lg = L.legs or 1
+	b.trans = L.ghost or 0
+	b:root(V(1.3 * bw, 1.4 * bw, 2.3), c1, L.mat)
+	b:add("Belly", "Root", "Ball", V(1.0 * bw, 0.9 * bw, 2.0), T(0, -0.28, -0.05), nil, c2)
+	b:add("Chest", "Root", "Ball", V(1.2 * bw, 1.3 * bw, 1.5), T(0, 0.12, -1.0), nil, c1, L.mat)
+	local nl = L.neck or 1
+	b:add("Neck", "Chest", "Ball", V(0.62 * bw, 0.62 * bw, nl), T(0, 0.35, -0.5, 0.5), V(0, 0, nl / 2), c1, L.mat)
+	local hs = L.head or 1
+	b:add("Head", "Neck", "Ball", V(0.78 * hs, 0.72 * hs, 1.0 * hs), T(0, 0, -nl / 2 + 0.05, -0.5), V(0, 0, 0.45 * hs), c1, L.mat)
+	b:add("Snout", "Head", "Ball", V(0.52 * hs, 0.42 * hs, (L.snout or 0.8) * hs), T(0, -0.06 * hs, -0.6 * hs), nil, c1, L.mat)
+	b:add("Jaw", "Head", "Ball", V(0.55 * hs, 0.22 * hs, 1.0 * hs), T(0, -0.28 * hs, 0.2 * hs), V(0, 0, 0.5 * hs), c2)
+	b:add("Teeth", "Jaw", "Ball", V(0.44 * hs, 0.09 * hs, 0.8 * hs), T(0, 0.1 * hs, -0.1 * hs), nil, WHITE)
+	eyes(b, "Head", hs, L.eye or Color3.fromRGB(255, 200, 40), 0.36, 0.14, -0.2)
+	if L.horns then horns(b, "Head", hs, L.horns, c3, 0.5, 0.2, 0.33, 0.0, 0.5) end
+	if L.crest then
+		b:add("Crest", "Head", "Ball", V(0.08, 0.55 * hs, 0.9 * hs), T(0, 0.45 * hs, -0.1 * hs), nil, c3)
+	end
+	if L.frill then
+		for _, s in ipairs({-1, 1}) do
+			b:add(s < 0 and "FrillL" or "FrillR", "Neck", "Ball", V(0.9, 0.9, 0.08), T(s * 0.32, 0.1, -nl * 0.3, 0, s * 0.9), nil, c3)
+		end
+	end
+	local th, sh = 1.0 * lg, 0.9 * lg
+	local drop
+	for _, s in ipairs({-1, 1}) do
+		drop = leg(b, s, "Root", "", 0.55 * bw, -0.4, 0.25, th, sh, 0.55 * bw, c1, c3, true)
+	end
+	drop = drop + 0.4
+	if not L.noarms then
+		local al = L.armlen or 0.55
+		for _, s in ipairs({-1, 1}) do
+			local n = s < 0 and "L" or "R"
+			b:add("Arm" .. n, "Chest", "Ball", V(0.16, al, 0.18), T(s * 0.55 * bw, -0.2, -0.5, -0.5), V(0, al * 0.4, 0), c1)
+			b:add("Hand" .. n, "Arm" .. n, "Ball", V(0.12, 0.12, L.claws and 1.1 or 0.3), T(0, -al * 0.45, -0.1), nil, L.claws and WHITE or c3)
+		end
+	end
+	local tl = L.tailLen or 1.0
+	local last = tail(b, "Root", L.tailseg or 4, 0.95 * tl, 0.85 * bw, c1, T(0, 0.08, 1.0), L.club and c3 or nil)
+	if L.club then b:add("Club", last, "Ball", V(0.9, 0.65, 0.9), T(0, 0, 0.6), nil, c3) end
+	if L.spikes then
+		for i = 1, L.spikes do
+			b:add("Spike" .. i, "Root", "Ball", V(0.1, 0.38, 0.28), T(0, 0.72 * bw, -1.4 + i * (2.6 / L.spikes), -0.2), V(0, -0.15, 0), c3, L.spikeMat)
+		end
+	end
+	if L.sail then
+		b:add("Sail", "Root", "Ball", V(0.1, 1.9, 2.3), T(0, 1.0, -0.2), nil, c3)
+		b:add("Sail2", "Sail", "Ball", V(0.1, 0.9, 1.2), T(0, 0.8, 0.1), nil, mix(c3, WHITE, 0.3))
+	end
+	if L.cracks then
+		for i = 1, 5 do
+			b:add("Crack" .. i, "Root", "Ball", V(0.04, 0.12, 0.5), T((i % 2 == 0 and 1 or -1) * 0.5 * bw, 0.35 - i * 0.05, -1.2 + i * 0.5, 0.2, 0, 0.4), nil, L.glow or Color3.fromRGB(255, 120, 20), Enum.Material.Neon, 0)
+		end
+	end
+	if L.angel then
+		for _, s in ipairs({-1, 1}) do
+			local n = s < 0 and "L" or "R"
+			b:add("Wing" .. n .. "1", "Chest", "Ball", V(1.8, 0.1, 0.9), T(s * 0.55, 0.55, 0.3, 0, 0, s * 0.6), V(-s * 0.9, 0, 0), WHITE)
+			b:add("Wing" .. n .. "2", "Wing" .. n .. "1", "Ball", V(1.4, 0.08, 0.7), T(s * 0.5, 0, 0.45, 0, -s * 0.3, 0), V(-s * 0.7, 0, 0), mix(WHITE, c3, 0.3))
+		end
+	end
+	if L.halo then
+		local h = b:add("Halo", "Head", "Cyl", V(0.06, 1.0, 1.0), T(0, 0.85 * hs, 0.1, 0, 0, math.pi / 2), nil, L.glow or Color3.fromRGB(255, 230, 120), Enum.Material.Neon, 0)
+	end
+	b:add("Saddle", "Root", "Block", V(0.1, 0.1, 0.1), T(0, 0.75 * bw, 0.1), nil, c1, nil, 1)
+	b.model:SetAttribute("Drop", drop * b.S)
+	b.model:SetAttribute("Saddle", (drop + 0.75 * bw) * b.S)
+end
+
+local function quad(b, L)
+	local c1 = L.c1
+	local c2 = L.c2 or mix(c1, WHITE, 0.5)
+	local c3 = L.c3 or mix(c1, BLACK, 0.45)
+	local bw = L.bulk or 1
+	b.trans = L.ghost or 0
+	b:root(V(1.9 * bw, 1.6 * bw, 3.2), c1, L.mat)
+	b:add("Belly", "Root", "Ball", V(1.5 * bw, 1.0 * bw, 2.8), T(0, -0.3, 0), nil, c2)
+	local nl = L.neck or 0.9
+	local up = L.neckup or 0.35
+	b:add("Neck", "Root", "Ball", V(0.8 * bw, 0.8 * bw, nl), T(0, 0.2, -1.4, up), V(0, 0, nl / 2), c1, L.mat)
+	local hs = L.head or 1
+	b:add("Head", "Neck", "Ball", V(0.85 * hs, 0.7 * hs, 1.1 * hs), T(0, 0, -nl / 2 + 0.05, -up), V(0, 0, 0.45 * hs), c1, L.mat)
+	b:add("Snout", "Head", "Ball", V(0.6 * hs, 0.45 * hs, 0.7 * hs), T(0, -0.1 * hs, -0.55 * hs), nil, c2)
+	b:add("Jaw", "Head", "Ball", V(0.5 * hs, 0.18 * hs, 0.8 * hs), T(0, -0.3 * hs, 0.15 * hs), V(0, 0, 0.4 * hs), c2)
+	eyes(b, "Head", hs, L.eye or Color3.fromRGB(255, 230, 90), 0.4, 0.14, -0.15)
+	if L.beak then b:add("Beak", "Head", "Ball", V(0.4 * hs, 0.35 * hs, 0.5 * hs), T(0, -0.12 * hs, -0.75 * hs), nil, c3) end
+	if L.trihorns then
+		b:add("HornC", "Head", "Ball", V(0.12, 0.12, 0.8 * hs), T(0, 0.0, -0.8 * hs, 0.2), nil, c3)
+		for _, s in ipairs({-1, 1}) do
+			b:add(s < 0 and "HornL" or "HornR", "Head", "Ball", V(0.14, 0.14, 1.2 * hs), T(s * 0.28 * hs, 0.32 * hs, -0.25 * hs, 0.35, s * 0.12, 0), V(0, 0, 0.6 * hs), c3)
+		end
+	end
+	if L.frill then
+		b:add("Frill", "Head", "Ball", V(1.7 * hs, 1.5 * hs, 0.12), T(0, 0.35 * hs, 0.5 * hs, -0.35), nil, c2)
+		b:add("FrillRim", "Frill", "Ball", V(1.8 * hs, 1.6 * hs, 0.08), T(0, 0, 0.06), nil, c3)
+	end
+	local lh = L.legh or 1
+	local drop = 0
+	for _, fz in ipairs({-1, 1}) do
+		for _, s in ipairs({-1, 1}) do
+			local nm = (fz < 0 and "F" or "B") .. (s < 0 and "L" or "R")
+			b:add("Leg" .. nm, "Root", "Ball", V(0.62 * bw, 1.1 * lh, 0.62 * bw), T(s * 0.85 * bw, -0.5, fz * 0.95), V(0, 0.5 * lh, 0), c1, L.mat)
+			b:add("Paw" .. nm, "Leg" .. nm, "Ball", V(0.7 * bw, 0.2, 0.9 * bw), T(0, -0.52 * lh, -0.1), nil, c3)
+			drop = 0.5 + 1.02 * lh + 0.1
+		end
+	end
+	local last = tail(b, "Root", 4, 1.0 * (L.tailLen or 1), 0.95 * bw, c1, T(0, 0.1, 1.45), nil)
+	if L.club then
+		b:add("Club", last, "Ball", V(1.1, 0.8, 1.1), T(0, 0, 0.6), nil, c3)
+	end
+	if L.tailSpikes then
+		for _, s in ipairs({-1, 1}) do
+			b:add(s < 0 and "TSpikeL" or "TSpikeR", last, "Ball", V(0.1, 0.1, 0.9), T(s * 0.2, 0.05, 0.55, 0, -s * 0.6, 0), nil, WHITE)
+		end
+	end
+	if L.plates then
+		for i = 1, L.plates do
+			local f = 1 - math.abs(i - (L.plates + 1) / 2) / L.plates
+			b:add("Plate" .. i, "Root", "Ball", V(0.1, 0.8 * f + 0.3, 0.8 * f + 0.3), T(((i % 2 == 0) and 0.15 or -0.15), 0.85 * bw, -1.2 + i * (2.9 / (L.plates + 1)), 0, 0, 0), V(0, -0.2, 0), c3, L.plateMat)
+		end
+	end
+	if L.armor then
+		for i = 1, 6 do
+			b:add("Bump" .. i, "Root", "Ball", V(0.5, 0.3, 0.5), T(((i % 2 == 0) and 0.55 or -0.55) * bw, 0.7 * bw, -1.0 + i * 0.4), nil, c3)
+		end
+	end
+	if L.crystals then
+		for i = 1, 5 do
+			b:add("Cry" .. i, "Root", "Ball", V(0.28, 1.0 - i * 0.1, 0.28), T(((i % 2 == 0) and 0.4 or -0.4), 0.8, -1.1 + i * 0.5, 0, 0, (i % 2 == 0) and -0.3 or 0.3), V(0, -0.35, 0), L.glow or c3, Enum.Material.Neon, 0)
+		end
+	end
+	b:add("Saddle", "Root", "Block", V(0.1, 0.1, 0.1), T(0, 0.8 * bw, 0), nil, c1, nil, 1)
+	b.model:SetAttribute("Drop", drop * b.S)
+	b.model:SetAttribute("Saddle", (drop + 0.8 * bw) * b.S)
+end
+
+---------------------------------------------------------------- DRAGONS
+local function wing(b, side, prefix, parent, pos, len, c1, c2, wingMat, big)
+	local n = (side < 0 and "L" or "R")
+	local nm1, nm2 = prefix .. n .. "1", prefix .. n .. "2"
+	b:add(nm1, parent, "Ball", V(len, 0.2, 0.22), T(side * pos.X, pos.Y, pos.Z, 0, 0, side * 0.25), V(-side * len / 2, 0, 0), c1)
+	-- inner membrane
+	b:add(prefix .. n .. "M1", nm1, "Ball", V(len * 0.95, 0.04, 1.3), T(side * len * 0.45, 0, 0.7), nil, c2, wingMat, 0.05)
+	b:add(nm2, nm1, "Ball", V(len * 1.15, 0.16, 0.18), T(side * len / 2, 0, 0, 0, -side * 0.4, 0), V(-side * len * 0.575, 0, 0), c1)
+	b:add(prefix .. n .. "M2", nm2, "Ball", V(len * 1.05, 0.04, 1.9), T(side * len * 0.5, 0, 0.9), nil, c2, wingMat, 0.05)
+	local fl = {1.5, 1.3, 1.1}
+	local an = {0.65, 1.0, 1.35}
+	for i = 1, 3 do
+		local fn = prefix .. n .. "F" .. i
+		b:add(fn, nm1, "Ball", V(len * fl[i] * 0.95, 0.08, 0.08), T(side * len / 2, 0, 0, 0, -side * an[i], 0), V(-side * len * fl[i] * 0.475, 0, 0), c1)
+		if i < 3 then
+			local mid = (an[i] + an[i + 1]) / 2
+			local l2 = len * fl[i + 1] * 0.75
+			b:add(fn .. "m", nm1, "Ball", V(l2, 0.035, l2 * 0.62), T(side * len / 2, 0, 0, 0, -side * mid, 0) * T(side * l2 * 0.5, 0, 0), nil, c2, wingMat, 0.05)
+		end
+	end
+end
+
+local function dragon(b, L)
+	local c1 = L.c1
+	local c2 = L.c2 or mix(c1, WHITE, 0.5)
+	local c3 = L.c3 or mix(c1, BLACK, 0.5)
+	local bw = L.bulk or 1
+	local eye = L.eye or Color3.fromRGB(255, 220, 60)
+	b.trans = L.ghost or 0
+	b:root(V(1.5 * bw, 1.4 * bw, 2.8), c1, L.mat)
+	b:add("Belly", "Root", "Ball", V(1.2 * bw, 0.9 * bw, 2.6), T(0, -0.3, 0), nil, c2)
+	b:add("Chest", "Root", "Ball", V(1.45 * bw, 1.4 * bw, 1.6), T(0, 0.1, -1.3), nil, c1, L.mat)
+	b:add("Neck", "Chest", "Ball", V(0.62, 0.62, 0.95), T(0, 0.3, -0.55, 0.55), V(0, 0, 0.45), c1, L.mat)
+	b:add("Neck2", "Neck", "Ball", V(0.55, 0.55, 0.95), T(0, 0, -0.45, -0.3), V(0, 0, 0.45), c1, L.mat)
+	b:add("Neck3", "Neck2", "Ball", V(0.5, 0.5, 0.95), T(0, 0, -0.45, -0.35), V(0, 0, 0.45), c1, L.mat)
+	local hs = L.head or 1
+	b:add("Head", "Neck3", "Ball", V(0.8 * hs, 0.7 * hs, 1.1 * hs), T(0, 0, -0.45, -0.1), V(0, 0, 0.5 * hs), c1, L.mat)
+	b:add("Snout", "Head", "Ball", V(0.52 * hs, 0.4 * hs, 0.85 * hs), T(0, -0.08 * hs, -0.65 * hs), nil, c1, L.mat)
+	b:add("Jaw", "Head", "Ball", V(0.5 * hs, 0.2 * hs, 1.0 * hs), T(0, -0.3 * hs, 0.2 * hs), V(0, 0, 0.5 * hs), c2)
+	b:add("Teeth", "Jaw", "Ball", V(0.4 * hs, 0.09 * hs, 0.8 * hs), T(0, 0.1 * hs, -0.1 * hs), nil, WHITE)
+	b:add("Nostril", "Snout", "Ball", V(0.18, 0.1, 0.12), T(0, 0.14 * hs, -0.35 * hs), nil, L.glow or eye, Enum.Material.Neon, 0)
+	eyes(b, "Head", hs, eye, 0.36, 0.15, -0.25)
+	horns(b, "Head", hs, L.horns or 1, c3, L.hornLen or 0.9, 0.22, 0.3, 0.15, 1.0)
+	if L.crown then
+		for i = 1, 5 do
+			b:add("Crown" .. i, "Head", "Ball", V(0.1, 0.45, 0.1), T((i - 3) * 0.16 * hs, 0.5 * hs, -0.1 * hs, 0, 0, (i - 3) * 0.12), V(0, -0.2, 0), Color3.fromRGB(255, 215, 70), Enum.Material.Neon, 0)
+		end
+	end
+	-- spine ridge
+	for i = 1, 6 do
+		b:add("Ridge" .. i, "Root", "Ball", V(0.1, 0.4, 0.3), T(0, 0.7 * bw, -1.8 + i * 0.55, -0.3), V(0, -0.15, 0), c3, L.spikeMat)
+	end
+	-- legs: hind
+	local drop
+	for _, s in ipairs({-1, 1}) do
+		drop = leg(b, s, "Root", "", 0.6 * bw, -0.35, 0.8, 0.9, 0.8, 0.55 * bw, c1, c3, true)
+		local n = s < 0 and "L" or "R"
+		b:add("FLeg" .. n, "Chest", "Ball", V(0.3, 0.8, 0.32), T(s * 0.55 * bw, -0.45, -0.4, -0.2), V(0, 0.3, 0), c1)
+		b:add("FPaw" .. n, "FLeg" .. n, "Ball", V(0.36, 0.14, 0.55), T(0, -0.38, -0.12), nil, c3)
+	end
+	drop = drop + 0.35
+	-- wings
+	local wl = L.wing or 1.7
+	for _, s in ipairs({-1, 1}) do
+		wing(b, s, "Wing", "Chest", V(0.55, 0.6, 0.1), wl, c1, L.wingColor or c2, L.wingMat, false)
+	end
+	if L.wings2 then
+		for _, s in ipairs({-1, 1}) do
+			wing(b, s, "WingB", "Root", V(0.5, 0.35, 0.9), wl * 0.7, c1, L.wingColor or c2, L.wingMat, false)
+		end
+	end
+	local last = tail(b, "Root", 6, 0.95, 0.9 * bw, c1, T(0, 0.05, 1.3), nil)
+	b:add("Spade", last, "Ball", V(0.9, 0.08, 0.75), T(0, 0, 0.5), nil, c3)
+	if L.halo then
+		b:add("Halo", "Head", "Cyl", V(0.07, 1.4, 1.4), T(0, 0.95 * hs, 0.1, 0, 0, math.pi / 2), nil, L.glow or Color3.fromRGB(255, 230, 120), Enum.Material.Neon, 0)
+	end
+	if L.veins then
+		for i = 1, 5 do
+			b:add("Vein" .. i, "Root", "Ball", V(0.05, 0.1, 0.7), T(((i % 2 == 0) and 0.55 or -0.55) * bw, 0.3, -1.4 + i * 0.55, 0.1, 0, (i % 2 == 0) and -0.4 or 0.4), nil, L.glow or c2, Enum.Material.Neon, 0)
+		end
+	end
+	if L.orbs then
+		for i = 1, L.orbs do
+			local a = (i / L.orbs) * math.pi * 2
+			b:add("Orb" .. i, "Root", "Ball", V(0.35, 0.35, 0.35), T(math.cos(a) * 2.4, 1.4, math.sin(a) * 1.8), nil, L.glow or c2, Enum.Material.Neon, 0)
+		end
+	end
+	b:add("Saddle", "Root", "Block", V(0.1, 0.1, 0.1), T(0, 0.75 * bw, -0.1), nil, c1, nil, 1)
+	b.model:SetAttribute("Drop", drop * b.S)
+	b.model:SetAttribute("Saddle", 0.75 * bw * b.S)
+end
+
+---------------------------------------------------------------- LOOKS
+local RGB = Color3.fromRGB
+M.Looks = {
+	StarterDino = {k = "biped", s = 0.62, c1 = RGB(90, 170, 70), c2 = RGB(220, 240, 160), c3 = RGB(60, 110, 50), head = 1.25, neck = 0.8, legs = 0.9, spikes = 4, eye = RGB(255, 255, 255)},
+	StarterDragon = {k = "dragon", s = 0.62, c1 = RGB(205, 65, 50), c2 = RGB(255, 190, 120), c3 = RGB(120, 30, 30), head = 1.2, horns = 1, wing = 1.5},
+	Velociraptor = {k = "biped", s = 0.55, c1 = RGB(176, 120, 60), c2 = RGB(240, 215, 170), c3 = RGB(90, 50, 30), neck = 0.9, head = 0.85, legs = 1.25, claws = true, tailLen = 1.3, spikes = 0},
+	Triceratops = {k = "quad", s = 0.62, c1 = RGB(120, 150, 110), c2 = RGB(190, 210, 160), c3 = RGB(235, 225, 190), trihorns = true, frill = true, head = 1.1, beak = true},
+	Stegosaurus = {k = "quad", s = 0.65, c1 = RGB(150, 140, 80), c3 = RGB(225, 110, 40), plates = 7, tailSpikes = true, head = 0.7, neck = 0.7, neckup = 0.1},
+	Ankylosaurus = {k = "quad", s = 0.65, c1 = RGB(140, 115, 95), c3 = RGB(90, 75, 65), armor = true, club = true, head = 0.8, bulk = 1.15, legh = 0.7},
+	FireDrake = {k = "dragon", s = 0.6, c1 = RGB(210, 70, 40), c2 = RGB(250, 170, 60), c3 = RGB(110, 30, 20), fx = RGB(255, 140, 40), horns = 1},
+	Dilophosaurus = {k = "biped", s = 0.62, c1 = RGB(80, 170, 150), c2 = RGB(220, 240, 200), c3 = RGB(230, 90, 70), frill = true, crest = true, neck = 1.1, head = 0.9, legs = 1.1},
+	Carnotaurus = {k = "biped", s = 0.7, c1 = RGB(170, 60, 50), c2 = RGB(230, 170, 120), c3 = RGB(60, 30, 30), horns = 1, bulk = 1.1, head = 1.2, armlen = 0.3},
+	Brachiosaurus = {k = "quad", s = 0.7, c1 = RGB(110, 150, 190), c2 = RGB(190, 215, 235), neck = 3.4, neckup = 1.05, head = 0.6, legh = 1.4, bulk = 1.1, tailLen = 1.2},
+	ToxicDragon = {k = "dragon", s = 0.62, c1 = RGB(80, 190, 70), c2 = RGB(190, 235, 60), c3 = RGB(40, 90, 40), fx = RGB(150, 255, 60), veins = true, glow = RGB(170, 255, 60), horns = 2},
+	TRex = {k = "biped", s = 0.78, c1 = RGB(110, 95, 70), c2 = RGB(190, 170, 130), c3 = RGB(50, 40, 30), bulk = 1.3, head = 1.5, neck = 0.8, armlen = 0.3, spikes = 0},
+	IceDragon = {k = "dragon", s = 0.66, c1 = RGB(150, 220, 255), c2 = RGB(235, 250, 255), c3 = RGB(90, 150, 210), fx = RGB(210, 240, 255), horns = 2, wingMat = Enum.Material.Glass},
+	Therizinosaurus = {k = "biped", s = 0.75, c1 = RGB(130, 90, 60), c2 = RGB(235, 220, 190), c3 = RGB(60, 45, 35), neck = 1.7, head = 0.7, claws = true, armlen = 1.1, bulk = 1.25, legs = 1.05},
+	Spinosaurus = {k = "biped", s = 0.78, c1 = RGB(70, 110, 130), c2 = RGB(180, 210, 190), c3 = RGB(215, 110, 50), sail = true, snout = 1.4, head = 1.2, neck = 1.2, bulk = 1.15},
+	StormDragon = {k = "dragon", s = 0.7, c1 = RGB(80, 90, 150), c2 = RGB(200, 210, 255), c3 = RGB(40, 40, 90), fx = RGB(180, 210, 255), veins = true, glow = RGB(255, 245, 120), horns = 2, wings2 = false},
+	Giganotosaurus = {k = "biped", s = 0.88, c1 = RGB(150, 100, 80), c2 = RGB(215, 185, 150), c3 = RGB(60, 40, 35), bulk = 1.35, head = 1.45, armlen = 0.3, spikes = 3},
+	ThunderDragon = {k = "dragon", s = 0.78, c1 = RGB(235, 195, 60), c2 = RGB(70, 55, 35), c3 = RGB(70, 55, 35), fx = RGB(255, 245, 120), veins = true, glow = RGB(255, 255, 140), horns = 2},
+	RoyalDragon = {k = "dragon", s = 0.85, c1 = RGB(120, 40, 160), c2 = RGB(255, 210, 80), c3 = RGB(255, 210, 80), crown = true, horns = 2, fx = RGB(255, 220, 120), wing = 1.9},
+	IndominusRex = {k = "biped", s = 0.95, c1 = RGB(235, 235, 225), c2 = RGB(255, 255, 250), c3 = RGB(185, 185, 175), bulk = 1.4, head = 1.5, spikes = 6, claws = true, armlen = 0.7, eye = RGB(255, 40, 40)},
+	InfernoDragon = {k = "dragon", s = 0.9, c1 = RGB(50, 25, 20), c2 = RGB(255, 110, 20), c3 = RGB(255, 110, 20), veins = true, glow = RGB(255, 120, 30), fx = RGB(255, 110, 20), horns = 2, wing = 2.0, spikeMat = Enum.Material.Neon},
+	MagmaRex = {k = "biped", s = 1.0, c1 = RGB(50, 30, 28), c2 = RGB(90, 50, 40), c3 = RGB(255, 110, 20), cracks = true, glow = RGB(255, 120, 20), fx = RGB(255, 120, 20), bulk = 1.4, head = 1.5, spikes = 5, spikeMat = Enum.Material.Neon, eye = RGB(255, 140, 30)},
+	AncientDragon = {k = "dragon", s = 1.0, c1 = RGB(130, 120, 90), c2 = RGB(215, 195, 135), c3 = RGB(70, 60, 45), horns = 3, hornLen = 1.2, wing = 2.1, bulk = 1.15, veins = true, glow = RGB(120, 255, 170)},
+	CrystalDragon = {k = "dragon", s = 1.0, c1 = RGB(120, 200, 255), c2 = RGB(200, 240, 255), c3 = RGB(60, 150, 255), mat = Enum.Material.Glass, wingMat = Enum.Material.Glass, spikeMat = Enum.Material.Neon, horns = 2, fx = RGB(180, 240, 255), wing = 2.0},
+	GeodeSaurus = {k = "quad", s = 1.0, c1 = RGB(110, 80, 150), c2 = RGB(170, 140, 210), c3 = RGB(200, 150, 255), crystals = true, glow = RGB(210, 150, 255), bulk = 1.2, head = 1.0, fx = RGB(210, 150, 255)},
+	PrismWyrm = {k = "dragon", s = 1.05, c1 = RGB(225, 150, 255), c2 = RGB(150, 255, 235), c3 = RGB(255, 230, 130), wingMat = Enum.Material.Neon, veins = true, glow = RGB(255, 255, 255), horns = 3, wing = 2.2, fx = RGB(255, 190, 255)},
+	ShadowDragon = {k = "dragon", s = 1.05, c1 = RGB(35, 25, 50), c2 = RGB(110, 55, 170), c3 = RGB(20, 12, 30), eye = RGB(255, 40, 220), fx = RGB(150, 60, 220), horns = 3, wing = 2.1},
+	PhantomRaptor = {k = "biped", s = 1.0, c1 = RGB(110, 100, 175), c2 = RGB(190, 180, 255), c3 = RGB(60, 50, 120), ghost = 0.45, eye = RGB(255, 255, 255), neck = 1.1, legs = 1.3, claws = true, fx = RGB(150, 140, 255), tailLen = 1.4},
+	VoidDragon = {k = "dragon", s = 1.1, c1 = RGB(15, 8, 25), c2 = RGB(90, 0, 160), c3 = RGB(60, 0, 110), eye = RGB(255, 60, 255), veins = true, glow = RGB(190, 60, 255), fx = RGB(170, 60, 255), horns = 3, wing = 2.4, wings2 = true},
+	CelestialDragon = {k = "dragon", s = 1.1, c1 = RGB(255, 245, 215), c2 = RGB(255, 215, 90), c3 = RGB(255, 200, 70), halo = true, glow = RGB(255, 230, 120), fx = RGB(255, 235, 150), horns = 2, wing = 2.3, spikeMat = Enum.Material.Neon},
+	AngelSaurus = {k = "biped", s = 1.1, c1 = RGB(250, 245, 235), c2 = RGB(255, 255, 255), c3 = RGB(255, 215, 100), angel = true, halo = true, glow = RGB(255, 235, 130), fx = RGB(255, 235, 150), neck = 1.3, head = 0.95, legs = 1.2, bulk = 1.1},
+	SolarWyrm = {k = "dragon", s = 1.15, c1 = RGB(255, 180, 40), c2 = RGB(255, 255, 210), c3 = RGB(255, 120, 20), mat = Enum.Material.Neon, halo = true, glow = RGB(255, 240, 150), fx = RGB(255, 200, 80), horns = 3, wing = 2.4, orbs = 3},
+	ElderDragon = {k = "dragon", s = 1.2, c1 = RGB(90, 75, 60), c2 = RGB(165, 140, 100), c3 = RGB(50, 40, 30), horns = 4, hornLen = 1.4, veins = true, glow = RGB(80, 255, 230), wing = 2.5, bulk = 1.25, wings2 = true, fx = RGB(80, 255, 230)},
+	SanctuaryRex = {k = "biped", s = 1.2, c1 = RGB(235, 215, 150), c2 = RGB(255, 245, 210), c3 = RGB(255, 195, 60), mat = Enum.Material.Metal, spikes = 7, spikeMat = Enum.Material.Neon, bulk = 1.45, head = 1.5, horns = 2, halo = true, glow = RGB(255, 200, 80), fx = RGB(255, 210, 100)},
+	PrimalRaptor = {k = "biped", s = 1.15, c1 = RGB(210, 90, 30), c2 = RGB(255, 205, 90), c3 = RGB(110, 30, 20), neck = 1.1, legs = 1.35, claws = true, tailLen = 1.4, cracks = true, glow = RGB(255, 220, 60), head = 1.1, fx = RGB(255, 160, 60), spikes = 6},
+	ChronoDragon = {k = "dragon", s = 1.25, c1 = RGB(40, 120, 200), c2 = RGB(240, 250, 255), c3 = RGB(80, 220, 255), halo = true, glow = RGB(80, 235, 255), veins = true, fx = RGB(90, 240, 255), horns = 3, wing = 2.6, wings2 = true, orbs = 4},
+	-- TITANICS: unique, heavily detailed designs (not scaled copies)
+	TitanicVoidWyrm = {k = "dragon", s = 11, c1 = RGB(12, 8, 22), c2 = RGB(70, 0, 130), c3 = RGB(40, 0, 80), eye = RGB(255, 60, 255), veins = true, glow = RGB(200, 70, 255), fx = RGB(170, 60, 255), horns = 5, hornLen = 1.5, wing = 2.8, wings2 = true, bulk = 1.3, head = 1.25, crown = true, orbs = 6, spikeMat = Enum.Material.Neon, wingMat = Enum.Material.ForceField, titanic = true},
+	TitanicCelestialDrake = {k = "dragon", s = 12, c1 = RGB(252, 247, 232), c2 = RGB(255, 205, 70), c3 = RGB(255, 190, 50), halo = true, glow = RGB(255, 235, 140), fx = RGB(255, 235, 150), horns = 5, hornLen = 1.6, wing = 3.0, wings2 = true, bulk = 1.3, head = 1.2, crown = true, orbs = 8, veins = true, mat = Enum.Material.Marble, wingMat = Enum.Material.Neon, spikeMat = Enum.Material.Neon, titanic = true},
+	TitanicApexRex = {k = "biped", s = 11, c1 = RGB(60, 40, 35), c2 = RGB(95, 65, 55), c3 = RGB(30, 22, 20), cracks = true, glow = RGB(255, 120, 20), fx = RGB(255, 120, 20), bulk = 1.6, head = 1.7, spikes = 12, spikeMat = Enum.Material.Neon, horns = 4, claws = true, armlen = 0.9, eye = RGB(255, 140, 30), legs = 1.1, tailseg = 6, tailLen = 1.2, titanic = true},
+}
+
+---------------------------------------------------------------- PUBLIC: PETS
+function M.Pet(name)
+	local L = M.Looks[name]
+	local b = newBuilder(name, L.s)
+	if L.k == "biped" then biped(b, L) elseif L.k == "quad" then quad(b, L) else dragon(b, L) end
+	local model = b.model
+	model:SetAttribute("Kind", L.k)
+	model:SetAttribute("Scale", L.s)
+	model:SetAttribute("Titanic", L.titanic == true)
+	if L.fx then aura(model, L.fx, L.titanic and 40 or 6, math.max(0.4, L.s * (L.titanic and 0.5 or 0.5)), 2) end
+	if L.titanic then
+		local pl = Instance.new("PointLight")
+		pl.Color = L.glow or L.fx or Color3.new(1, 1, 1)
+		pl.Range = 60
+		pl.Brightness = 2
+		pl.Parent = model.PrimaryPart
+	end
+	local rig = {model = model, joints = b.joints, base = {}, kind = L.k, phase = 0, scale = L.s, titanic = L.titanic == true}
+	for n, j in pairs(b.joints) do rig.base[n] = j.C0 end
+	for _, p in ipairs(model:GetDescendants()) do
+		if p:IsA("BasePart") then rig.has = true break end
+	end
+	rig.tails = 0
+	while b.joints["Tail" .. (rig.tails + 1)] do rig.tails = rig.tails + 1 end
+	return rig
+end
+
+-- procedural animation. speed = studs/s of the creature, flying = bool, attack = 0..1 lunge pulse
+function M.Animate(rig, dt, speed, flying, attack)
+	local j = rig.joints
+	local T0 = os.clock()
+	local moving = math.clamp(speed / 6, 0, 1)
+	local heavy = rig.titanic and 0.45 or 1
+	rig.phase = rig.phase + dt * (3 + speed * 0.45 * (rig.titanic and 0.22 or 0.6)) * (moving > 0.05 and 1 or 0)
+	local ph = rig.phase
+	local function set(n, cf) local m = j[n] if m then m.Transform = cf end end
+	local sw = 0.7 * moving
+	if rig.kind == "Dino" or rig.kind == "biped" then
+		for _, s in ipairs({"L", "R"}) do
+			local o = s == "L" and 0 or math.pi
+			set("Thigh" .. s, A(math.sin(ph + o) * sw, 0, 0))
+			set("Shin" .. s, A(math.max(0, -math.sin(ph + o + 0.8)) * 0.9 * moving, 0, 0))
+			set("Arm" .. s, A(math.sin(ph * 0.5 + o) * 0.25 * moving + math.sin(os.clock() * 2) * 0.05, 0, 0))
+		end
+		set("Body", CF())
+	end
+	if rig.kind == "quad" then
+		set("LegFL", A(math.sin(ph) * sw, 0, 0)) set("LegBR", A(math.sin(ph) * sw, 0, 0))
+		set("LegFR", A(math.sin(ph + math.pi) * sw, 0, 0)) set("LegBL", A(math.sin(ph + math.pi) * sw, 0, 0))
+	end
+	local t = T0
+	for i = 1, rig.tails do
+		set("Tail" .. i, A(0, math.sin(t * 2 * heavy - i * 0.55) * (0.1 + 0.12 * moving), math.sin(t * 1.3 - i * 0.4) * 0.03))
+	end
+	local bob = math.sin(t * 1.6) * 0.04
+	set("Neck", A(bob, math.sin(t * 0.9) * 0.05, 0))
+	set("Neck2", A(bob, 0, 0))
+	local jawOpen = 0.08 + math.max(0, math.sin(t * 0.7)) * 0.06 + (attack or 0) * 0.55
+	set("Jaw", A(-jawOpen, 0, 0))
+	set("Head", A((attack or 0) * 0.3, 0, 0))
+	if j.WingL1 then
+		local f = flying and 7 or (moving > 0.05 and 4.2 or 2.1) * heavy
+		local amp = flying and 0.75 or 0.5
+		for _, pre in ipairs({"Wing", "WingB"}) do
+			for _, s in ipairs({-1, 1}) do
+				local n = s < 0 and "L" or "R"
+				local a = math.sin(t * f + (pre == "WingB" and 0.6 or 0)) * amp
+				set(pre .. n .. "1", A(0, 0, s * a))
+				set(pre .. n .. "2", A(0, 0, s * math.sin(t * f - 0.9) * amp * 0.6))
+			end
+		end
+		set("ThighL", A(0.3 + math.sin(t * 2) * 0.05, 0, 0)) set("ThighR", A(0.3 + math.sin(t * 2) * 0.05, 0, 0))
+		set("ShinL", A(-0.4, 0, 0)) set("ShinR", A(-0.4, 0, 0))
+	end
+	local halo = j.Halo
+	if halo then halo.Transform = A(0, math.rad(t * 60 % 360), 0) end
+	for i = 1, 8 do
+		local o = j["Orb" .. i]
+		if o then o.Transform = CF(0, math.sin(t * 2 + i) * 0.4 * rig.scale, 0) end
+	end
+end
+
+---------------------------------------------------------------- PUBLIC: ENEMIES (anchored, no joints)
+local function ep(model, name, size, cf, color, mat, kind, collide)
+	local p = newPart(model, name, size, color, mat, kind or "Block")
+	p.Anchored = true
+	p.CFrame = cf
+	p.CanQuery = true
+	p.CanCollide = collide == true
+	p.Massless = false
+	return p
+end
+
+function M.Enemy(arch, theme, scale, name, boss)
+	local model = Instance.new("Model")
+	model.Name = name
+	local S = scale
+	local c1, c2, mat, glow = theme.c1, theme.c2, theme.mat, theme.glow
+	local base = CF(0, 0, 0)
+	local function P(n, size, pos, color, m, kind, rot)
+		local cf = base * CF(pos * S) * (rot or CF())
+		return ep(model, n, size * S, cf, color or c1, m or mat, kind or "Block")
+	end
+	local height
+	local root
+	if arch == "Golem" or arch == "Boss" then
+		root = P("Root", V(3.2, 3.4, 2.4), V(0, 4.2, 0), c1, mat, "Block")
+		root.CanCollide = true
+		P("Core", V(1.2, 1.2, 0.5), V(0, 4.4, -1.2), glow, Enum.Material.Neon, "Ball")
+		P("Head", V(1.7, 1.6, 1.7), V(0, 6.6, -0.1), c1, mat, "Block")
+		P("EyeL", V(0.3, 0.25, 0.2), V(-0.4, 6.7, -1.0), glow, Enum.Material.Neon, "Block")
+		P("EyeR", V(0.3, 0.25, 0.2), V(0.4, 6.7, -1.0), glow, Enum.Material.Neon, "Block")
+		for _, s in ipairs({-1, 1}) do
+			P("Arm" .. s, V(1.1, 3.4, 1.2), V(s * 2.3, 4.0, 0), c1, mat, "Block")
+			P("Fist" .. s, V(1.5, 1.4, 1.5), V(s * 2.3, 2.0, -0.2), c2, mat, "Block")
+			P("Leg" .. s, V(1.3, 2.4, 1.5), V(s * 0.9, 1.2, 0), c1, mat, "Block")
+			P("Shoulder" .. s, V(1.5, 0.9, 1.6), V(s * 2.2, 6.0, 0), c2, mat, "Ball")
+			P("Spike" .. s, V(0.4, 1.4, 0.4), V(s * 2.2, 6.8, 0), glow, Enum.Material.Neon, "Ball", CF() * A(0, 0, s * 0.3))
+		end
+		if arch == "Boss" or boss then
+			for i = 1, 5 do
+				P("Crown" .. i, V(0.3, 1.1, 0.3), V((i - 3) * 0.45, 7.8, 0), glow, Enum.Material.Neon, "Ball", A(0, 0, (i - 3) * 0.15))
+			end
+			P("Cape", V(3.6, 4.2, 0.2), V(0, 4.2, 1.4), c2, Enum.Material.Fabric, "Block")
+		end
+		height = 8.6
+	elseif arch == "Beast" then
+		root = P("Root", V(3.4, 2.6, 5.2), V(0, 3.0, 0), c1, mat, "Ball")
+		root.CanCollide = true
+		P("Head", V(2.0, 1.8, 2.2), V(0, 3.4, -3.2), c1, mat, "Ball")
+		P("Snout", V(1.3, 1.0, 1.4), V(0, 3.0, -4.3), c2, mat, "Ball")
+		P("EyeL", V(0.3, 0.3, 0.3), V(-0.7, 3.9, -4.0), glow, Enum.Material.Neon, "Ball")
+		P("EyeR", V(0.3, 0.3, 0.3), V(0.7, 3.9, -4.0), glow, Enum.Material.Neon, "Ball")
+		for _, s in ipairs({-1, 1}) do
+			P("Horn" .. s, V(0.4, 1.9, 0.4), V(s * 0.8, 4.8, -3.0), c2, mat, "Ball", A(-0.4, 0, s * -0.4))
+			P("Tusk" .. s, V(0.25, 1.3, 0.25), V(s * 0.6, 2.4, -4.6), WHITE, Enum.Material.SmoothPlastic, "Ball", A(0.5, 0, 0))
+			for _, z in ipairs({-1.6, 1.6}) do
+				P("Leg" .. s .. z, V(0.9, 2.4, 1.0), V(s * 1.3, 1.1, z), c1, mat, "Block")
+			end
+		end
+		for i = 1, 5 do
+			P("Spine" .. i, V(0.3, 1.0, 0.5), V(0, 4.6, -2 + i * 0.9), glow, Enum.Material.Neon, "Ball")
+		end
+		P("Tail", V(0.9, 0.9, 2.8), V(0, 3.2, 3.8), c1, mat, "Ball", A(-0.3, 0, 0))
+		height = 6.2
+	else -- Elemental
+		root = P("Root", V(3.4, 3.4, 3.4), V(0, 5.0, 0), glow, Enum.Material.Neon, "Ball")
+		root.CanCollide = true
+		P("Shell", V(4.4, 4.4, 4.4), V(0, 5.0, 0), c1, Enum.Material.Glass, "Ball").Transparency = 0.45
+		P("Base", V(2.4, 3.2, 2.4), V(0, 1.6, 0), c1, mat, "Ball")
+		for i = 1, 6 do
+			local a = i / 6 * math.pi * 2
+			P("Shard" .. i, V(0.7, 2.2, 0.7), V(math.cos(a) * 3.4, 5 + math.sin(a * 2) * 0.8, math.sin(a) * 3.4), c2, Enum.Material.Neon, "Ball", A(0, a, 0.5))
+		end
+		height = 8
+	end
+	model.PrimaryPart = root
+	root.PivotOffset = CF(0, -root.Position.Y, 0)
+	model:SetAttribute("Height", height * S)
+	model:SetAttribute("Radius", 4 * S)
+	return model
+end
+
+return M
+]]></ProtectedString></Properties></Item></Item><Item class="ServerScriptService" referent="RBX16"><Properties><string name="Name">ServerScriptService</string></Properties><Item class="Script" referent="RBX14"><Properties><string name="Name">GameServer</string><ProtectedString name="Source"><![CDATA[-- GameServer (Script) | ServerScriptService.GameServer
+-- Server-authoritative: data, hatching, combat, coins, areas, riding.
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local DSS = game:GetService("DataStoreService")
+local RunService = game:GetService("RunService")
+local CollectionService = game:GetService("CollectionService")
+
+Players.CharacterAutoLoads = false
+
+local Config = require(RS:WaitForChild("Config"))
+local MB = require(RS:WaitForChild("ModelBuilder"))
+local WorldBuilder = require(script.Parent:WaitForChild("WorldBuilder"))
+
+---------------------------------------------------------------- remotes
+local Remotes = Instance.new("Folder")
+Remotes.Name = "Remotes"
+Remotes.Parent = RS
+local E = {}
+for _, n in ipairs({"Data", "Notify", "PetHit", "Damage", "Defeated", "Coin", "Announce", "Fx", "Select"}) do
+	local r = Instance.new("RemoteEvent")
+	r.Name = n
+	r.Parent = Remotes
+	E[n] = r
+end
+local Act = Instance.new("RemoteFunction")
+Act.Name = "Act"
+Act.Parent = Remotes
+
+---------------------------------------------------------------- data
+local store = DSS:GetDataStore("BeastboundV1")
+local S = {} -- [player] = state
+local rng = Random.new()
+
+local function defaultData()
+	return {coins = 0, starter = false, owned = {}, equipped = {}, areas = {["1"] = true}, discovered = {}, settings = {music = 0.5, sfx = 0.8}, v = 1}
+end
+
+local function sanitize(d)
+	local def = defaultData()
+	for k, v in pairs(def) do if d[k] == nil then d[k] = v end end
+	d.settings.music = d.settings.music or 0.5
+	d.settings.sfx = d.settings.sfx or 0.8
+	for name, n in pairs(d.owned) do if not Config.Pets[name] or type(n) ~= "number" or n <= 0 then d.owned[name] = nil end end
+	local eq = {}
+	local used = {}
+	for _, name in ipairs(d.equipped) do
+		if d.owned[name] and (used[name] or 0) < d.owned[name] and #eq < Config.MaxEquipped then
+			used[name] = (used[name] or 0) + 1
+			eq[#eq + 1] = name
+		end
+	end
+	d.equipped = eq
+	return d
+end
+
+local function loadData(player)
+	local key = "P_" .. player.UserId
+	for i = 1, 5 do
+		local ok, res = pcall(function() return store:GetAsync(key) end)
+		if ok then
+			if res then return sanitize(res), true end
+			return defaultData(), true
+		end
+		warn("[Beastbound] load failed, retry", i, res)
+		task.wait(1.5 * i)
+	end
+	return nil, false
+end
+
+local function saveData(player, final)
+	local st = S[player]
+	if not st or not st.canSave then return end
+	local key = "P_" .. player.UserId
+	for i = 1, 4 do
+		local ok, err = pcall(function()
+			store:UpdateAsync(key, function() return st.data end)
+		end)
+		if ok then st.dirty = false return true end
+		warn("[Beastbound] save failed, retry", i, err)
+		task.wait(1.5 * i)
+	end
+	return false
+end
+
+local function push(player)
+	local st = S[player]
+	if st then E.Data:FireClient(player, st.data) end
+end
+local function queuePush(player)
+	local st = S[player]
+	if not st or st.pushing then return end
+	st.pushing = true
+	task.delay(0.12, function()
+		st.pushing = false
+		if player.Parent then push(player) end
+	end)
+end
+local function notify(player, text, kind) E.Notify:FireClient(player, text, kind or "info") end
+
+local function applyEquippedAttr(player)
+	local st = S[player]
+	player:SetAttribute("Equipped", table.concat(st.data.equipped, ","))
+end
+
+---------------------------------------------------------------- world + enemies
+local worldReady = false
+local world
+local Enemies = {}
+local enemiesFolder = Instance.new("Folder")
+enemiesFolder.Name = "Enemies"
+enemiesFolder.Parent = workspace
+
+local function updateBar(model, d)
+	local bar = model.PrimaryPart and model.PrimaryPart:FindFirstChild("Bar")
+	if not bar then return end
+	local f = math.clamp(d.hp / d.max, 0, 1)
+	bar.Back.Fill.Size = UDim2.fromScale(f, 1)
+	bar.Back.HP.Text = Config.Format(math.max(d.hp, 0)) .. " / " .. Config.Format(d.max)
+end
+
+local spawnEnemy
+spawnEnemy = function(spec, areaIdx)
+	local area = Config.Areas[areaIdx]
+	local def = spec.def
+	local scales = {1, 1.3, 1.7, 2.6}
+	local model = MB.Enemy(def[2], area.theme, scales[spec.tier], def[1], spec.tier == 4)
+	local root = model.PrimaryPart
+	-- health bar (built at origin so we can read the offset)
+	local g = Instance.new("BillboardGui")
+	g.Name = "Bar"
+	g.Adornee = root
+	g.Size = UDim2.fromOffset(190, 52)
+	g.StudsOffsetWorldSpace = Vector3.new(0, model:GetAttribute("Height") - root.Position.Y + 3, 0)
+	g.MaxDistance = 160
+	g.Parent = root
+	local nm = Instance.new("TextLabel")
+	nm.BackgroundTransparency = 1 nm.Size = UDim2.new(1, 0, 0.45, 0) nm.Font = Enum.Font.FredokaOne nm.TextScaled = true
+	nm.TextColor3 = spec.tier == 4 and Color3.fromRGB(255, 120, 120) or Color3.new(1, 1, 1) nm.TextStrokeTransparency = 0
+	nm.Text = def[1] nm.Parent = g
+	local back = Instance.new("Frame")
+	back.Name = "Back" back.Position = UDim2.fromScale(0.05, 0.5) back.Size = UDim2.fromScale(0.9, 0.45) back.BackgroundColor3 = Color3.fromRGB(30, 30, 40) back.BorderSizePixel = 0 back.Parent = g
+	Instance.new("UICorner", back).CornerRadius = UDim.new(0, 8)
+	local st = Instance.new("UIStroke", back) st.Thickness = 2 st.Color = Color3.new(0, 0, 0)
+	local fill = Instance.new("Frame")
+	fill.Name = "Fill" fill.Size = UDim2.fromScale(1, 1) fill.BackgroundColor3 = spec.tier == 4 and Color3.fromRGB(255, 80, 80) or Color3.fromRGB(90, 230, 90) fill.BorderSizePixel = 0 fill.Parent = back
+	Instance.new("UICorner", fill).CornerRadius = UDim.new(0, 8)
+	local hp = Instance.new("TextLabel")
+	hp.Name = "HP" hp.BackgroundTransparency = 1 hp.Size = UDim2.fromScale(1, 1) hp.Font = Enum.Font.GothamBold hp.TextScaled = true
+	hp.TextColor3 = Color3.new(1, 1, 1) hp.TextStrokeTransparency = 0.3 hp.ZIndex = 3 hp.Parent = back
+
+	local mult = Config.TierMult[spec.tier]
+	local d = {hp = area.hp * mult, max = area.hp * mult, area = areaIdx, reward = area.reward * mult, tier = spec.tier, contrib = {}, alive = true}
+	Enemies[model] = d
+	model:SetAttribute("Area", areaIdx)
+	model:SetAttribute("Tier", spec.tier)
+	model:SetAttribute("EnemyName", def[1])
+	CollectionService:AddTag(model, "Enemy")
+	updateBar(model, d)
+	local face = spec.face
+	model:PivotTo(CFrame.lookAt(spec.pos, spec.pos + Vector3.new(face.X, 0, face.Z)))
+	model.Parent = enemiesFolder
+	d.spec = spec
+	return model
+end
+
+local function defeat(model)
+	local d = Enemies[model]
+	if not d or not d.alive then return end
+	d.alive = false
+	model:SetAttribute("Dead", true)
+	local bar = model.PrimaryPart:FindFirstChild("Bar")
+	if bar then bar.Enabled = false end
+	local pos = model:GetPivot().Position + Vector3.new(0, 4, 0)
+	E.Defeated:FireAllClients(model)
+	local total = 0
+	for p, dmg in pairs(d.contrib) do if p.Parent then total = total + dmg end end
+	for p, dmg in pairs(d.contrib) do
+		local st = S[p]
+		if st and p.Parent and total > 0 then
+			local amount = math.max(1, math.floor(d.reward * (dmg / total)))
+			st.data.coins = st.data.coins + amount
+			E.Coin:FireClient(p, pos, amount)
+			queuePush(p)
+		end
+	end
+	for p, s in pairs(S) do
+		local tv = p:FindFirstChild("Target")
+		if tv and tv.Value == model then tv.Value = nil end
+	end
+	local spec, area = d.spec, d.area
+	task.delay(2.4, function()
+		Enemies[model] = nil
+		model:Destroy()
+	end)
+	task.delay(Config.TierRespawn[d.tier], function()
+		if world then spawnEnemy(spec, area) end
+	end)
+end
+
+local function damageEnemy(player, model, amount)
+	local d = Enemies[model]
+	if not d or not d.alive then return end
+	d.hp = d.hp - amount
+	d.contrib[player] = (d.contrib[player] or 0) + amount
+	updateBar(model, d)
+	if d.hp <= 0 then defeat(model) end
+end
+
+-- combat loop
+local acc = 0
+RunService.Heartbeat:Connect(function(dt)
+	acc = acc + dt
+	if acc < 0.1 then return end
+	acc = 0
+	local now = os.clock()
+	for player, st in pairs(S) do
+		local tv = player:FindFirstChild("Target")
+		local enemy = tv and tv.Value
+		if enemy then
+			local d = Enemies[enemy]
+			local char = player.Character
+			local hrp = char and char:FindFirstChild("HumanoidRootPart")
+			if not d or not d.alive or not hrp or not enemy.Parent or (hrp.Position - enemy:GetPivot().Position).Magnitude > Config.AttackRange then
+				tv.Value = nil
+			else
+				for i, name in ipairs(st.data.equipped) do
+					local nh = st.nextHit[i]
+					if not nh then
+						st.nextHit[i] = now + (i - 1) * 0.25 + 0.5
+					elseif now >= nh then
+						st.nextHit[i] = now + Config.HitInterval
+						local dmg = Config.GetDamage(name)
+						E.PetHit:FireAllClients(player, i, enemy, dmg)
+						E.Damage:FireClient(player, enemy, dmg)
+						damageEnemy(player, enemy, dmg)
+						if not d.alive then break end
+					end
+				end
+			end
+		end
+	end
+end)
+
+---------------------------------------------------------------- actions
+local function areaUnlocked(st, i) return st.data.areas[tostring(i)] == true end
+
+local function unlockArea(player, i)
+	local st = S[player]
+	if not st or type(i) ~= "number" then return false end
+	i = math.floor(i)
+	local area = Config.Areas[i]
+	if not area or areaUnlocked(st, i) then return false end
+	if i > 1 and not areaUnlocked(st, i - 1) then notify(player, "Unlock the previous area first!", "error") return false end
+	if st.data.coins < area.cost then notify(player, "Not enough coins! Need " .. Config.Format(area.cost), "error") return false end
+	st.data.coins = st.data.coins - area.cost
+	st.data.areas[tostring(i)] = true
+	notify(player, area.name .. " unlocked! New egg available at spawn!", "good")
+	E.Fx:FireClient(player, "AreaUnlock", i)
+	push(player)
+	task.spawn(saveData, player)
+	return true
+end
+
+local function roll(egg)
+	local total = 0
+	for _, o in ipairs(egg.odds) do total = total + o[2] end
+	local r = rng:NextNumber() * total
+	local acc2 = 0
+	for _, o in ipairs(egg.odds) do
+		acc2 = acc2 + o[2]
+		if r <= acc2 then return o[1] end
+	end
+	return egg.odds[1][1]
+end
+
+local function hatch(player, eggId, count)
+	local st = S[player]
+	if not st or not st.data.starter then return {ok = false, err = "Pick a starter first"} end
+	local egg = Config.Eggs[tostring(eggId)]
+	if not egg then return {ok = false, err = "Unknown egg"} end
+	if count ~= 1 and count ~= 3 and count ~= 8 then count = 1 end
+	if not areaUnlocked(st, egg.area) then return {ok = false, err = "Area not unlocked"} end
+	local now = os.clock()
+	if st.lastHatch and now - st.lastHatch < 0.6 then return {ok = false, err = "Slow down"} end
+	local stand = world and world.Stands[egg.id]
+	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if not stand or not hrp or (hrp.Position - stand.PrimaryPart.Position).Magnitude > 45 then return {ok = false, err = "Stand next to the egg"} end
+	local cost = egg.price * count
+	if st.data.coins < cost then return {ok = false, err = "Not enough coins"} end
+	st.lastHatch = now
+	st.data.coins = st.data.coins - cost
+	local results = {}
+	for i = 1, count do
+		local name = roll(egg)
+		results[i] = name
+		st.data.owned[name] = (st.data.owned[name] or 0) + 1
+		st.data.discovered[name] = true
+		local pet = Config.Pets[name]
+		if pet.titanic then
+			task.delay(5.5, function() E.Announce:FireAllClients("Titanic", player.Name, pet.display, name) end)
+		elseif Config.Rarities[pet.rarity].order >= 6 then
+			task.delay(4.5, function() E.Announce:FireAllClients("Rare", player.Name, pet.display, pet.rarity) end)
+		end
+	end
+	-- auto-equip the first pets if there is room
+	if #st.data.equipped < Config.MaxEquipped then
+		for _, name in ipairs(results) do
+			if #st.data.equipped < Config.MaxEquipped then st.data.equipped[#st.data.equipped + 1] = name end
+		end
+		applyEquippedAttr(player)
+	end
+	push(player)
+	task.spawn(saveData, player)
+	return {ok = true, results = results}
+end
+
+local function countEq(eq, name)
+	local n = 0
+	for _, v in ipairs(eq) do if v == name then n = n + 1 end end
+	return n
+end
+
+local function setEq(player, newEq)
+	local st = S[player]
+	st.data.equipped = newEq
+	st.nextHit = {}
+	applyEquippedAttr(player)
+	push(player)
+end
+
+local handlers = {}
+
+handlers.ChooseStarter = function(player, kind)
+	local st = S[player]
+	if st.data.starter then return false end
+	local name = kind == "Dragon" and "StarterDragon" or (kind == "Dino" and "StarterDino" or nil)
+	if not name then return false end
+	st.data.starter = name
+	st.data.owned[name] = 1
+	st.data.discovered[name] = true
+	st.data.equipped = {name}
+	applyEquippedAttr(player)
+	push(player)
+	task.spawn(saveData, player)
+	return true
+end
+
+handlers.RequestData = function(player) push(player) return true end
+
+handlers.Hatch = function(player, eggId, count) return hatch(player, eggId, count) end
+
+handlers.Equip = function(player, name)
+	local st = S[player]
+	if type(name) ~= "string" or not st.data.owned[name] then return false end
+	local eq = st.data.equipped
+	if #eq >= Config.MaxEquipped or countEq(eq, name) >= st.data.owned[name] then return false end
+	eq[#eq + 1] = name
+	setEq(player, eq)
+	return true
+end
+
+handlers.Unequip = function(player, idx)
+	local st = S[player]
+	if type(idx) ~= "number" or not st.data.equipped[idx] then return false end
+	table.remove(st.data.equipped, idx)
+	setEq(player, st.data.equipped)
+	return true
+end
+
+handlers.UnequipAll = function(player)
+	setEq(player, {})
+	return true
+end
+
+handlers.EquipBest = function(player)
+	local st = S[player]
+	local list = {}
+	for name, n in pairs(st.data.owned) do
+		for _ = 1, n do list[#list + 1] = name end
+	end
+	table.sort(list, function(a, b) return Config.Pets[a].dmg > Config.Pets[b].dmg end)
+	local eq = {}
+	for i = 1, math.min(Config.MaxEquipped, #list) do eq[i] = list[i] end
+	setEq(player, eq)
+	return true
+end
+
+handlers.UnlockArea = function(player, i) return unlockArea(player, i) end
+
+handlers.Teleport = function(player, i)
+	local st = S[player]
+	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if not hrp or type(i) ~= "number" then return false end
+	player:SetAttribute("Riding", nil)
+	if i == 0 then
+		hrp.CFrame = world.SpawnCF
+		return true
+	end
+	if not areaUnlocked(st, i) or not world.AreaSpawns[i] then return false end
+	hrp.CFrame = world.AreaSpawns[i]
+	return true
+end
+
+handlers.Ride = function(player, name)
+	local st = S[player]
+	if name == nil or name == "" then player:SetAttribute("Riding", nil) return true end
+	local pet = type(name) == "string" and Config.Pets[name]
+	if not pet or not pet.titanic or not st.data.owned[name] then return false end
+	player:SetAttribute("Riding", name)
+	return true
+end
+
+handlers.SetSetting = function(player, key, value)
+	local st = S[player]
+	if (key == "music" or key == "sfx") and type(value) == "number" then
+		st.data.settings[key] = math.clamp(value, 0, 1)
+		return true
+	end
+	return false
+end
+
+Act.OnServerInvoke = function(player, action, a, b)
+	local st = S[player]
+	if not st or type(action) ~= "string" or not handlers[action] then return false end
+	local ok, res = pcall(handlers[action], player, a, b)
+	if not ok then warn("[Beastbound] action error", action, res) return false end
+	return res
+end
+
+E.Select.OnServerEvent:Connect(function(player, model)
+	local st = S[player]
+	local tv = player:FindFirstChild("Target")
+	if not st or not tv then return end
+	if model == nil then tv.Value = nil return end
+	if typeof(model) ~= "Instance" then return end
+	local d = Enemies[model]
+	if not d or not d.alive or not areaUnlocked(st, d.area) then return end
+	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if not hrp or (hrp.Position - model:GetPivot().Position).Magnitude > Config.AttackRange + 60 then return end
+	tv.Value = model
+	st.nextHit = {}
+end)
+
+---------------------------------------------------------------- players
+local function setupCharacter(player, char)
+	local hum = char:WaitForChild("Humanoid")
+	hum.WalkSpeed = 22
+	player:SetAttribute("Riding", nil)
+	hum.Died:Connect(function()
+		local tv = player:FindFirstChild("Target")
+		if tv then tv.Value = nil end
+		task.delay(3, function()
+			if player.Parent then player:LoadCharacter() end
+		end)
+	end)
+end
+
+local started = {}
+local function onPlayer(player)
+	if started[player] then return end
+	started[player] = true
+	local tv = Instance.new("ObjectValue")
+	tv.Name = "Target"
+	tv.Parent = player
+	while not worldReady do task.wait(0.25) end
+	local data, ok = loadData(player)
+	local canSave = true
+	if not ok then
+		if RunService:IsStudio() then
+			data = defaultData()
+			canSave = false
+			warn("[Beastbound] Studio without DataStore access: progress will NOT be saved this session.")
+		else
+			player:Kick("Could not load your save. Please rejoin - your progress is safe.")
+			return
+		end
+	end
+	S[player] = {data = data, canSave = canSave, nextHit = {}}
+	player:SetAttribute("Equipped", table.concat(data.equipped, ","))
+	player:SetAttribute("Ready", true)
+	player.CharacterAdded:Connect(function(c) setupCharacter(player, c) end)
+	push(player)
+	player:LoadCharacter()
+end
+
+Players.PlayerAdded:Connect(onPlayer)
+Players.PlayerRemoving:Connect(function(player)
+	saveData(player, true)
+	S[player] = nil
+	started[player] = nil
+end)
+
+task.spawn(function()
+	while true do
+		task.wait(60)
+		for player in pairs(S) do task.spawn(saveData, player) end
+	end
+end)
+
+game:BindToClose(function()
+	if RunService:IsStudio() then return end
+	local pending = 0
+	for player in pairs(S) do
+		pending = pending + 1
+		task.spawn(function() saveData(player, true) pending = pending - 1 end)
+	end
+	local t = os.clock()
+	while pending > 0 and os.clock() - t < 25 do task.wait(0.2) end
+end)
+
+---------------------------------------------------------------- build the world, then enemies
+world = WorldBuilder.Build()
+for i, prompt in pairs(world.Prompts) do
+	prompt.Triggered:Connect(function(player) unlockArea(player, i) end)
+end
+for i, list in pairs(world.EnemySpawns) do
+	for _, spec in ipairs(list) do spawnEnemy(spec, i) end
+end
+worldReady = true
+for _, p in ipairs(Players:GetPlayers()) do task.spawn(onPlayer, p) end
+print("[Beastbound] world ready")
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX15"><Properties><string name="Name">WorldBuilder</string><ProtectedString name="Source"><![CDATA[-- WorldBuilder (ModuleScript) | ServerScriptService.WorldBuilder
+local RS = game:GetService("ReplicatedStorage")
+local Config = require(RS:WaitForChild("Config"))
+local W = {}
+local Terrain = workspace.Terrain
+local rng = Random.new(2024)
+local V, CF, A = Vector3.new, CFrame.new, CFrame.Angles
+local Mat = Enum.Material
+local count = 0
+
+local function tick()
+	count = count + 1
+	if count % 120 == 0 then task.wait() end
+end
+
+local function part(par, name, size, cf, color, mat, shape, collide)
+	local p = Instance.new("Part")
+	p.Name = name
+	p.Anchored = true
+	p.Size = size
+	p.CFrame = cf
+	p.Color = color
+	p.Material = mat or Mat.SmoothPlastic
+	p.CanCollide = collide ~= false
+	p.TopSurface = Enum.SurfaceType.Smooth
+	p.BottomSurface = Enum.SurfaceType.Smooth
+	if shape == "Ball" then
+		local m = Instance.new("SpecialMesh")
+		m.MeshType = Enum.MeshType.Sphere
+		m.Parent = p
+	elseif shape == "Cyl" then
+		p.Shape = Enum.PartType.Cylinder
+	end
+	p.Parent = par
+	tick()
+	return p
+end
+
+local rayParams = RaycastParams.new()
+rayParams.FilterType = Enum.RaycastFilterType.Include
+rayParams.FilterDescendantsInstances = {Terrain}
+local function groundY(x, z)
+	local r = workspace:Raycast(V(x, 160, z), V(0, -320, 0), rayParams)
+	return r and r.Position.Y or 0
+end
+
+local function pick(t) return t[rng:NextInteger(1, #t)] end
+local function rc(c, v) -- jitter colour
+	v = v or 0.08
+	local h, s, val = c:ToHSV()
+	return Color3.fromHSV(h, s, math.clamp(val + rng:NextNumber(-v, v), 0, 1))
+end
+
+---------------------------------------------------------------- decoration kits
+local K = {}
+
+function K.pine(par, pos, s, leaf, snow)
+	local m = Instance.new("Model") m.Name = "Pine" m.Parent = par
+	local h = 14 * s
+	part(m, "Trunk", V(1.4 * s, h, 1.4 * s), CF(pos + V(0, h / 2, 0)), Color3.fromRGB(95, 65, 40), Mat.Wood)
+	for i = 1, 4 do
+		local w = (11 - i * 2.2) * s
+		part(m, "L" .. i, V(w, 4 * s, w), CF(pos + V(0, h * 0.4 + i * 3.2 * s, 0)), rc(leaf), Mat.Grass, "Ball", false)
+		if snow then part(m, "S" .. i, V(w * 0.8, 1.6 * s, w * 0.8), CF(pos + V(0, h * 0.4 + i * 3.2 * s + 1.4 * s, 0)), Color3.fromRGB(245, 250, 255), Mat.Snow, "Ball", false) end
+	end
+end
+
+function K.oak(par, pos, s, leaf)
+	local m = Instance.new("Model") m.Name = "Tree" m.Parent = par
+	part(m, "Trunk", V(2 * s, 9 * s, 2 * s), CF(pos + V(0, 4.5 * s, 0)), Color3.fromRGB(110, 78, 50), Mat.Wood, "Cyl").CFrame = CF(pos + V(0, 4.5 * s, 0)) * A(0, 0, math.pi / 2)
+	for i = 1, 4 do
+		local o = V(rng:NextNumber(-3, 3) * s, 0, rng:NextNumber(-3, 3) * s)
+		part(m, "Leaf" .. i, V(8 * s, 6 * s, 8 * s), CF(pos + V(0, 11 * s, 0) + o), rc(leaf), Mat.Grass, "Ball", false)
+	end
+end
+
+function K.jungleTree(par, pos, s)
+	local m = Instance.new("Model") m.Name = "JungleTree" m.Parent = par
+	local h = 30 * s
+	local lean = rng:NextNumber(-0.15, 0.15)
+	local t = part(m, "Trunk", V(h, 3 * s, 3 * s), CF(pos + V(0, h / 2, 0)) * A(0, 0, math.pi / 2 + lean), Color3.fromRGB(90, 62, 40), Mat.Wood, "Cyl")
+	local top = pos + V(-math.sin(lean) * h / 2 * -1, h, 0)
+	for i = 1, 5 do
+		local a = i / 5 * math.pi * 2
+		part(m, "Frond" .. i, V(16 * s, 1.2, 5 * s), CF(top + V(math.cos(a) * 6 * s, -1, math.sin(a) * 6 * s)) * A(0, -a, -0.35), rc(Color3.fromRGB(60, 150, 55)), Mat.Grass, "Ball", false)
+	end
+	for i = 1, 3 do
+		part(m, "Vine" .. i, V(0.4, 14 * s, 0.4), CF(top + V(rng:NextNumber(-4, 4), -8 * s, rng:NextNumber(-4, 4))), Color3.fromRGB(50, 110, 40), Mat.Grass, nil, false)
+	end
+	part(m, "Canopy", V(14 * s, 7 * s, 14 * s), CF(top + V(0, 2 * s, 0)), rc(Color3.fromRGB(45, 120, 50)), Mat.Grass, "Ball", false)
+end
+
+function K.fern(par, pos, s)
+	for i = 1, 5 do
+		local a = i / 5 * math.pi * 2
+		part(par, "Fern", V(5 * s, 0.3, 1.4 * s), CF(pos + V(math.cos(a) * 2 * s, 1.2 * s, math.sin(a) * 2 * s)) * A(0, -a, 0.5), rc(Color3.fromRGB(70, 160, 60)), Mat.Grass, "Ball", false)
+	end
+end
+
+function K.rock(par, pos, s, color, mat)
+	local m = part(par, "Rock", V(rng:NextNumber(4, 8) * s, rng:NextNumber(3, 6) * s, rng:NextNumber(4, 8) * s), CF(pos + V(0, 1.2 * s, 0)) * A(rng:NextNumber(-0.3, 0.3), rng:NextNumber(0, 6), rng:NextNumber(-0.3, 0.3)), rc(color), mat or Mat.Slate, "Ball")
+	return m
+end
+
+function K.crystal(par, pos, s, color, glass)
+	local n = rng:NextInteger(2, 4)
+	for i = 1, n do
+		local h = rng:NextNumber(8, 20) * s
+		part(par, "Crystal", V(2.4 * s, h, 2.4 * s), CF(pos + V(rng:NextNumber(-3, 3), h / 2 - 1, rng:NextNumber(-3, 3))) * A(rng:NextNumber(-0.35, 0.35), rng:NextNumber(0, 6), rng:NextNumber(-0.35, 0.35)), rc(color, 0.12), glass and Mat.Glass or Mat.Neon, "Ball", false).Transparency = glass and 0.25 or 0.1
+	end
+	local l = Instance.new("PointLight") l.Color = color l.Range = 22 l.Brightness = 1.2
+	l.Parent = par:FindFirstChildWhichIsA("BasePart", true)
+end
+
+function K.iceSpike(par, pos, s)
+	local h = rng:NextNumber(10, 26) * s
+	part(par, "IceSpike", V(4 * s, h, 4 * s), CF(pos + V(0, h / 2 - 1, 0)) * A(rng:NextNumber(-0.2, 0.2), rng:NextNumber(0, 6), rng:NextNumber(-0.2, 0.2)), Color3.fromRGB(170, 225, 255), Mat.Ice, "Ball").Transparency = 0.15
+end
+
+function K.deadTree(par, pos, s, color)
+	local m = Instance.new("Model") m.Name = "DeadTree" m.Parent = par
+	local h = 18 * s
+	part(m, "Trunk", V(h, 1.6 * s, 1.6 * s), CF(pos + V(0, h / 2, 0)) * A(0, 0, math.pi / 2 + rng:NextNumber(-0.2, 0.2)), color, Mat.Wood, "Cyl")
+	for i = 1, 4 do
+		local a = rng:NextNumber(0, 6.28)
+		part(m, "Branch", V(9 * s, 0.7 * s, 0.7 * s), CF(pos + V(0, h * (0.45 + i * 0.12), 0)) * A(0, a, 0.7), color, Mat.Wood, "Cyl", false)
+	end
+end
+
+function K.pillar(par, pos, h, color, mat, glow)
+	part(par, "Pillar", V(4, h, 4), CF(pos + V(0, h / 2, 0)), color, mat, "Cyl").CFrame = CF(pos + V(0, h / 2, 0)) * A(0, 0, math.pi / 2)
+	part(par, "Cap", V(5.6, 1.2, 5.6), CF(pos + V(0, h + 0.6, 0)), color, mat)
+	part(par, "Base", V(5.6, 1.2, 5.6), CF(pos + V(0, 0.6, 0)), color, mat)
+	if glow then part(par, "Rune", V(0.4, h * 0.6, 0.4), CF(pos + V(2.1, h * 0.5, 0)), glow, Mat.Neon, nil, false) end
+end
+
+function K.torch(par, pos, color)
+	part(par, "TorchPole", V(0.8, 6, 0.8), CF(pos + V(0, 3, 0)), Color3.fromRGB(70, 55, 40), Mat.Wood)
+	local b = part(par, "Brazier", V(2.6, 1.2, 2.6), CF(pos + V(0, 6.4, 0)), Color3.fromRGB(50, 50, 55), Mat.Metal, "Cyl", false)
+	b.CFrame = CF(pos + V(0, 6.4, 0)) * A(0, 0, math.pi / 2)
+	local f = Instance.new("Fire") f.Color = color f.SecondaryColor = Color3.new(1, 1, 1) f.Size = 5 f.Heat = 6 f.Parent = b
+	local l = Instance.new("PointLight") l.Color = color l.Range = 24 l.Brightness = 1.5 l.Parent = b
+end
+
+function K.cloud(par, pos, s)
+	local m = Instance.new("Model") m.Name = "Cloud" m.Parent = par
+	for i = 1, 5 do
+		part(m, "Puff", V(rng:NextNumber(14, 24) * s, rng:NextNumber(6, 10) * s, rng:NextNumber(14, 22) * s), CF(pos + V(rng:NextNumber(-12, 12) * s, rng:NextNumber(-2, 2), rng:NextNumber(-8, 8) * s)), Color3.fromRGB(255, 252, 255), Mat.SmoothPlastic, "Ball", false).Transparency = 0.12
+	end
+end
+
+function K.skull(par, pos, s, color, rot)
+	local m = Instance.new("Model") m.Name = "Skull" m.Parent = par
+	local base = CF(pos) * A(0, rot or 0, 0)
+	part(m, "Cranium", V(12 * s, 9 * s, 16 * s), base * CF(0, 5 * s, 0), color, Mat.Slate, "Ball")
+	part(m, "Snout", V(8 * s, 5 * s, 12 * s), base * CF(0, 3 * s, -10 * s), color, Mat.Slate, "Ball")
+	for _, sd in ipairs({-1, 1}) do
+		part(m, "Socket", V(3 * s, 3 * s, 3 * s), base * CF(sd * 4 * s, 7 * s, -5.5 * s), Color3.fromRGB(15, 15, 20), Mat.SmoothPlastic, "Ball", false)
+		part(m, "Horn", V(2 * s, 14 * s, 2 * s), base * CF(sd * 5 * s, 10 * s, 5 * s) * A(-0.5, 0, sd * -0.4), color, Mat.Slate, "Ball", false)
+		for i = 1, 4 do part(m, "Tooth", V(1 * s, 3 * s, 1 * s), base * CF(sd * 2.5 * s, 0.5 * s, (-6 - i * 2) * s), Color3.fromRGB(235, 230, 215), Mat.Marble, "Ball", false) end
+	end
+end
+
+function K.ribcage(par, pos, s, color, rot)
+	local base = CF(pos) * A(0, rot or 0, 0)
+	for i = 1, 6 do
+		for _, sd in ipairs({-1, 1}) do
+			for k = 1, 3 do
+				local a = k / 3 * 1.2
+				part(par, "Rib", V(1 * s, 6 * s, 1 * s), base * CF(sd * math.sin(a) * 6 * s, 5 * s + math.cos(a) * 5 * s, i * 4 * s) * A(0, 0, sd * -a), color, Mat.Marble, "Ball", false)
+			end
+		end
+	end
+	part(par, "Spine", V(2 * s, 2 * s, 28 * s), base * CF(0, 12 * s, 12 * s), color, Mat.Marble, "Ball", false)
+end
+
+function K.arch(par, cf, w, h, color, mat, glow)
+	part(par, "ArchL", V(4, h, 4), cf * CF(-w / 2, h / 2, 0), color, mat)
+	part(par, "ArchR", V(4, h, 4), cf * CF(w / 2, h / 2, 0), color, mat)
+	part(par, "ArchTop", V(w + 8, 4, 5), cf * CF(0, h + 2, 0), color, mat)
+	part(par, "ArchCrown", V(w * 0.6, 5, 6), cf * CF(0, h + 6, 0), color, mat, "Ball")
+	if glow then
+		part(par, "ArchGlow", V(w + 2, 1, 1), cf * CF(0, h - 0.5, -2.6), glow, Mat.Neon, nil, false)
+	end
+end
+
+local function emitter(par, pos, size, color, rate, speed, life, lightEm, sz, dir)
+	local p = part(par, "Atmos", size, CF(pos), Color3.new(1, 1, 1), Mat.SmoothPlastic, nil, false)
+	p.Transparency = 1
+	p.CanQuery = false
+	local e = Instance.new("ParticleEmitter")
+	e.Color = ColorSequence.new(color)
+	e.Rate = rate
+	e.Lifetime = NumberRange.new(life, life * 1.6)
+	e.Speed = NumberRange.new(speed, speed * 1.5)
+	e.EmissionDirection = dir or Enum.NormalId.Bottom
+	e.SpreadAngle = Vector2.new(30, 30)
+	e.LightEmission = lightEm or 0.3
+	e.Size = NumberSequence.new(sz or 0.6)
+	e.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.2, 0.2), NumberSequenceKeypoint.new(0.8, 0.3), NumberSequenceKeypoint.new(1, 1)})
+	e.Shape = Enum.ParticleEmitterShape.Box
+	e.Parent = p
+	return p
+end
+
+---------------------------------------------------------------- area builders
+local function scatter(c, rmin, rmax, n, fn, avoidEntrance, entranceDir)
+	for i = 1, n do
+		local a = rng:NextNumber(0, math.pi * 2)
+		local r = rng:NextNumber(rmin, rmax)
+		local p = c + V(math.cos(a) * r, 0, math.sin(a) * r)
+		local ok = true
+		if avoidEntrance then
+			local d = (p - c)
+			if d.Unit:Dot(entranceDir) > 0.93 and r > 120 then ok = false end
+		end
+		if ok then
+			p = V(p.X, groundY(p.X, p.Z), p.Z)
+			fn(p)
+		end
+	end
+end
+
+local function hills(c, mat, n, rmin, rmax, minR, maxR, yoff)
+	for i = 1, n do
+		local a = rng:NextNumber(0, math.pi * 2)
+		local r = rng:NextNumber(rmin, rmax)
+		Terrain:FillBall(c + V(math.cos(a) * r, yoff or 0, math.sin(a) * r), rng:NextNumber(minR, maxR), mat)
+		if i % 6 == 0 then task.wait() end
+	end
+end
+
+local AreaBuild = {}
+
+AreaBuild[1] = function(c, par, ed)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 230, Mat.Grass)
+	hills(c, Mat.Grass, 18, 40, 200, 14, 30, -8)
+	hills(c, Mat.Ground, 6, 60, 190, 8, 14, -6)
+	scatter(c, 20, 215, 45, function(p) K.oak(par, p, rng:NextNumber(0.9, 1.5), Color3.fromRGB(95, 170, 70)) end, true, ed)
+	scatter(c, 20, 215, 40, function(p) K.rock(par, p, rng:NextNumber(0.8, 2), Color3.fromRGB(150, 140, 125), Mat.Slate) end)
+	scatter(c, 30, 210, 40, function(p) for _ = 1, 3 do part(par, "Flower", V(1, 1, 1), CF(p + V(rng:NextNumber(-3, 3), 0.8, rng:NextNumber(-3, 3))), pick({Color3.fromRGB(255, 120, 150), Color3.fromRGB(255, 230, 90), Color3.fromRGB(180, 130, 255)}), Mat.SmoothPlastic, "Ball", false) end end)
+	-- landmark: stone dino skeleton arch
+	K.ribcage(par, c + V(0, 0, -30), 1.6, Color3.fromRGB(235, 228, 205), 0)
+	K.skull(par, c + V(0, 0, -78), 1.3, Color3.fromRGB(235, 228, 205), 0)
+	-- pond
+	Terrain:FillCylinder(CF(c + V(90, -3, 60)), 8, 26, Mat.Water)
+	emitter(par, c + V(0, 55, 0), V(380, 2, 380), Color3.fromRGB(255, 255, 220), 6, 1, 8, 0.6, 0.5)
+end
+
+AreaBuild[2] = function(c, par, ed)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 230, Mat.LeafyGrass)
+	hills(c, Mat.Mud, 14, 30, 200, 10, 22, -6)
+	hills(c, Mat.LeafyGrass, 18, 40, 200, 14, 26, -8)
+	Terrain:FillCylinder(CF(c + V(-70, -3, 40)), 8, 34, Mat.Water)
+	Terrain:FillCylinder(CF(c + V(70, -3, -80)), 8, 22, Mat.Water)
+	scatter(c, 20, 215, 55, function(p) K.jungleTree(par, p, rng:NextNumber(0.9, 1.5)) end, true, ed)
+	scatter(c, 15, 215, 70, function(p) K.fern(par, p, rng:NextNumber(1, 2)) end)
+	scatter(c, 20, 215, 25, function(p) K.rock(par, p, rng:NextNumber(0.8, 1.6), Color3.fromRGB(70, 95, 60), Mat.Slate) end)
+	-- giant hanging bridge ruin
+	K.pillar(par, c + V(-20, 0, -100), 24, Color3.fromRGB(100, 125, 90), Mat.Cobblestone, Color3.fromRGB(180, 255, 100))
+	K.pillar(par, c + V(20, 0, -100), 24, Color3.fromRGB(100, 125, 90), Mat.Cobblestone, Color3.fromRGB(180, 255, 100))
+	part(par, "RuinLintel", V(52, 4, 6), CF(c + V(0, 26, -100)), Color3.fromRGB(100, 125, 90), Mat.Cobblestone)
+	emitter(par, c + V(0, 30, 0), V(360, 40, 360), Color3.fromRGB(190, 255, 120), 10, 0.6, 6, 1, 0.45, Enum.NormalId.Top)
+end
+
+AreaBuild[3] = function(c, par, ed)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 230, Mat.Snow)
+	hills(c, Mat.Snow, 16, 30, 200, 14, 30, -8)
+	hills(c, Mat.Glacier, 8, 50, 190, 10, 24, -6)
+	Terrain:FillCylinder(CF(c + V(60, -2, 30)), 6, 45, Mat.Ice)
+	scatter(c, 20, 215, 50, function(p) K.pine(par, p, rng:NextNumber(0.9, 1.6), Color3.fromRGB(40, 100, 80), true) end, true, ed)
+	scatter(c, 20, 215, 40, function(p) K.iceSpike(par, p, rng:NextNumber(0.8, 1.6)) end)
+	scatter(c, 20, 215, 25, function(p) K.rock(par, p, rng:NextNumber(0.8, 1.8), Color3.fromRGB(190, 205, 220), Mat.Ice) end)
+	K.arch(par, CF(c + V(0, 0, -90)), 40, 30, Color3.fromRGB(170, 220, 245), Mat.Ice, Color3.fromRGB(120, 230, 255))
+	emitter(par, c + V(0, 70, 0), V(400, 2, 400), Color3.new(1, 1, 1), 60, 6, 9, 0.2, 0.4)
+end
+
+AreaBuild[4] = function(c, par, ed)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 230, Mat.Rock)
+	for i = 1, 9 do
+		local a = rng:NextNumber(0, math.pi * 2)
+		local r = rng:NextNumber(110, 200)
+		local p = c + V(math.cos(a) * r, 0, math.sin(a) * r)
+		local h = rng:NextNumber(40, 75)
+		for k = 0, 5 do
+			Terrain:FillCylinder(CF(p + V(0, k * h / 6, 0)), h / 6 + 1, 38 - k * 5.5, k < 4 and Mat.Rock or Mat.Snow)
+		end
+		if i % 3 == 0 then task.wait() end
+	end
+	hills(c, Mat.Slate, 14, 30, 200, 10, 22, -6)
+	scatter(c, 20, 215, 40, function(p) K.rock(par, p, rng:NextNumber(1.2, 3), Color3.fromRGB(110, 110, 125), Mat.Granite) end)
+	scatter(c, 20, 215, 22, function(p) K.pine(par, p, rng:NextNumber(0.9, 1.4), Color3.fromRGB(50, 90, 60), false) end, true, ed)
+	-- dragon nest with huge eggs
+	local nc = c + V(0, 0, 20)
+	Terrain:FillCylinder(CF(nc + V(0, -1, 0)), 4, 36, Mat.Ground)
+	for i = 1, 14 do local a = i / 14 * 6.283 part(par, "NestTwig", V(18, 1.4, 1.4), CF(nc + V(math.cos(a) * 28, 1, math.sin(a) * 28)) * A(0, -a + 1.57, 0.2), Color3.fromRGB(100, 75, 50), Mat.Wood, "Cyl", false) end
+	for i = 1, 4 do local a = i / 4 * 6.283 part(par, "DragonEgg", V(9, 12, 9), CF(nc + V(math.cos(a) * 10, 6, math.sin(a) * 10)), pick({Color3.fromRGB(200, 70, 50), Color3.fromRGB(70, 100, 200), Color3.fromRGB(60, 160, 90)}), Mat.Slate, "Ball") end
+	K.skull(par, c + V(-80, 0, -60), 1.7, Color3.fromRGB(215, 205, 190), 0.8)
+	emitter(par, c + V(0, 60, 0), V(380, 2, 380), Color3.fromRGB(230, 235, 245), 14, 3, 8, 0.1, 0.9)
+end
+
+AreaBuild[5] = function(c, par, ed)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 230, Mat.Basalt)
+	hills(c, Mat.Basalt, 14, 40, 200, 10, 22, -7)
+	hills(c, Mat.Slate, 6, 40, 200, 8, 14, -6)
+	-- volcano
+	local vc = c + V(0, 0, -40)
+	for k = 0, 9 do Terrain:FillCylinder(CF(vc + V(0, k * 8, 0)), 9, 70 - k * 6, Mat.Basalt) end
+	Terrain:FillCylinder(CF(vc + V(0, 78, 0)), 5, 16, Mat.CrackedLava)
+	emitter(par, vc + V(0, 86, 0), V(14, 2, 14), Color3.fromRGB(255, 120, 30), 80, 40, 2.4, 1, 1.4, Enum.NormalId.Top)
+	emitter(par, vc + V(0, 92, 0), V(30, 2, 30), Color3.fromRGB(60, 50, 50), 20, 14, 6, 0, 6, Enum.NormalId.Top)
+	for i = 1, 7 do
+		local p = c + V(rng:NextNumber(-170, 170), 0, rng:NextNumber(-100, 170))
+		if (p - c).Magnitude < 200 and (p - vc).Magnitude > 75 then
+			Terrain:FillCylinder(CF(p + V(0, -1.5, 0)), 3, rng:NextNumber(10, 22), Mat.CrackedLava)
+			local l = Instance.new("PointLight") l.Color = Color3.fromRGB(255, 110, 30) l.Range = 28 l.Brightness = 2
+			local g = part(par, "LavaGlow", V(2, 1, 2), CF(p + V(0, 2, 0)), Color3.fromRGB(255, 100, 20), Mat.Neon, nil, false) g.Transparency = 0.5 l.Parent = g
+		end
+	end
+	scatter(c, 20, 215, 40, function(p) K.deadTree(par, p, rng:NextNumber(0.8, 1.4), Color3.fromRGB(35, 28, 25)) end, true, ed)
+	scatter(c, 20, 215, 35, function(p) K.rock(par, p, rng:NextNumber(1, 2.4), Color3.fromRGB(40, 32, 32), Mat.Basalt) end)
+	emitter(par, c + V(0, 20, 0), V(380, 20, 380), Color3.fromRGB(255, 130, 40), 40, 6, 5, 1, 0.5, Enum.NormalId.Top)
+end
+
+AreaBuild[6] = function(c, par, ed)
+	-- hollow cavern dome
+	Terrain:FillBall(c, 242, Mat.Slate)
+	Terrain:FillBall(c, 226, Mat.Air)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 235, Mat.Slate)
+	hills(c, Mat.Slate, 12, 40, 190, 10, 20, -7)
+	-- entrance tunnel through the dome wall
+	Terrain:FillBlock(CF(c + ed * 232 + V(0, 19, 0)) * A(0, math.atan2(-ed.X, -ed.Z), 0), V(36, 38, 40), Mat.Air)
+	scatter(c, 15, 215, 50, function(p) K.crystal(par, p, rng:NextNumber(0.8, 1.8), pick({Color3.fromRGB(120, 230, 255), Color3.fromRGB(200, 120, 255), Color3.fromRGB(255, 130, 200), Color3.fromRGB(130, 255, 190)}), false) end)
+	scatter(c, 15, 215, 15, function(p) K.crystal(par, p, rng:NextNumber(0.8, 1.4), Color3.fromRGB(160, 220, 255), true) end)
+	scatter(c, 20, 215, 25, function(p) K.rock(par, p, rng:NextNumber(1, 2.5), Color3.fromRGB(80, 70, 110), Mat.Slate) end)
+	-- stalactites
+	for i = 1, 30 do
+		local a = rng:NextNumber(0, 6.28) local r = rng:NextNumber(0, 200)
+		local h = rng:NextNumber(14, 40)
+		part(par, "Stalactite", V(7, h, 7), CF(c + V(math.cos(a) * r, 222 - h / 2 - 20, math.sin(a) * r)), Color3.fromRGB(95, 85, 130), Mat.Slate, "Ball", false)
+	end
+	local lamp = part(par, "CaveGlow", V(4, 4, 4), CF(c + V(0, 150, 0)), Color3.fromRGB(150, 200, 255), Mat.Neon, "Ball", false)
+	local l = Instance.new("PointLight") l.Range = 60 l.Brightness = 4 l.Color = Color3.fromRGB(150, 190, 255) l.Parent = lamp
+	emitter(par, c + V(0, 70, 0), V(380, 120, 380), Color3.fromRGB(170, 240, 255), 18, 0.8, 7, 1, 0.7, Enum.NormalId.Top)
+end
+
+AreaBuild[7] = function(c, par, ed)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 230, Mat.Slate)
+	hills(c, Mat.Basalt, 14, 40, 200, 10, 24, -7)
+	scatter(c, 20, 215, 45, function(p) K.deadTree(par, p, rng:NextNumber(1, 1.8), Color3.fromRGB(28, 20, 38)) end, true, ed)
+	scatter(c, 20, 215, 22, function(p) K.crystal(par, p, rng:NextNumber(0.8, 1.6), Color3.fromRGB(170, 60, 240), false) end)
+	scatter(c, 20, 215, 25, function(p) K.rock(par, p, rng:NextNumber(1, 2.4), Color3.fromRGB(40, 32, 55), Mat.Slate) end)
+	-- floating dark monoliths and a portal ring
+	for i = 1, 8 do
+		local a = i / 8 * 6.283 local p = c + V(math.cos(a) * 140, 0, math.sin(a) * 140)
+		local m = part(par, "Monolith", V(7, 36, 7), CF(p + V(0, 24 + math.sin(i) * 4, 0)) * A(0, a, 0.1), Color3.fromRGB(20, 14, 30), Mat.Slate)
+		part(par, "MonolithRune", V(0.6, 24, 0.6), CF(p + V(0, 24, 0)) * A(0, a, 0.1) * CF(0, 0, -3.6), Color3.fromRGB(190, 70, 255), Mat.Neon, nil, false)
+	end
+	local ring = part(par, "PortalRing", V(1.5, 46, 46), CF(c + V(0, 30, 40)) * A(0, 0.4, 0), Color3.fromRGB(190, 70, 255), Mat.Neon, "Cyl", false)
+	ring.CFrame = ring.CFrame * A(0, 0, 0)
+	part(par, "PortalCore", V(0.4, 38, 38), CF(c + V(0, 30, 40)) * A(0, 0.4, 0), Color3.fromRGB(20, 0, 40), Mat.Neon, "Cyl", false).Transparency = 0.3
+	emitter(par, c + V(0, 40, 0), V(380, 80, 380), Color3.fromRGB(190, 90, 255), 24, 1, 8, 1, 0.8, Enum.NormalId.Top)
+end
+
+AreaBuild[8] = function(c, par, ed)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 230, Mat.Salt)
+	hills(c, Mat.Limestone, 10, 40, 190, 8, 16, -6)
+	for i = 1, 14 do K.cloud(par, c + V(rng:NextNumber(-260, 260), rng:NextNumber(-12, 4), rng:NextNumber(-260, 260)), rng:NextNumber(1.2, 2.4)) end
+	for i = 1, 8 do K.cloud(par, c + V(rng:NextNumber(-300, 300), rng:NextNumber(60, 120), rng:NextNumber(-300, 300)), rng:NextNumber(1.4, 2.8)) end
+	-- palace
+	local pc = c + V(0, 0, -50)
+	part(par, "PalaceFloor", V(110, 3, 90), CF(pc + V(0, 1.5, 0)), Color3.fromRGB(250, 245, 235), Mat.Marble)
+	for i = 0, 5 do for _, z in ipairs({-38, 38}) do K.pillar(par, pc + V(-45 + i * 18, 3, z), 34, Color3.fromRGB(250, 245, 235), Mat.Marble, Color3.fromRGB(255, 220, 100)) end end
+	part(par, "PalaceRoof", V(110, 4, 90), CF(pc + V(0, 40, 0)), Color3.fromRGB(255, 215, 100), Mat.Metal)
+	part(par, "Dome", V(60, 40, 60), CF(pc + V(0, 44, 0)), Color3.fromRGB(255, 240, 200), Mat.Marble, "Ball", false)
+	part(par, "DomeSpire", V(2, 24, 2), CF(pc + V(0, 76, 0)), Color3.fromRGB(255, 215, 100), Mat.Neon, "Ball", false)
+	-- floating islands
+	for i = 1, 8 do
+		local a = i / 8 * 6.283 local p = c + V(math.cos(a) * 170, 30 + math.sin(i * 2) * 14, math.sin(a) * 170)
+		part(par, "IslandBase", V(26, 16, 26), CF(p), Color3.fromRGB(190, 170, 150), Mat.Limestone, "Ball")
+		part(par, "IslandTop", V(30, 4, 30), CF(p + V(0, 7, 0)), Color3.fromRGB(110, 200, 110), Mat.Grass, "Cyl").CFrame = CF(p + V(0, 7, 0)) * A(0, 0, math.pi / 2)
+		K.oak(par, p + V(0, 9, 0), 0.7, Color3.fromRGB(255, 190, 220))
+	end
+	scatter(c, 20, 215, 30, function(p) K.pillar(par, p, rng:NextNumber(10, 22), Color3.fromRGB(250, 245, 235), Mat.Marble, nil) end, true, ed)
+	emitter(par, c + V(0, 50, 0), V(380, 60, 380), Color3.fromRGB(255, 240, 170), 30, 1, 8, 1, 0.7, Enum.NormalId.Top)
+end
+
+AreaBuild[9] = function(c, par, ed)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 230, Mat.Limestone)
+	hills(c, Mat.Sandstone, 12, 40, 200, 10, 20, -7)
+	K.ribcage(par, c + V(-25, 0, -60), 3, Color3.fromRGB(240, 230, 205), 0)
+	K.skull(par, c + V(-25, 0, -130), 3, Color3.fromRGB(240, 230, 205), 0)
+	for i = 1, 6 do
+		local a = i / 6 * 6.283 K.pillar(par, c + V(math.cos(a) * 80, 0, math.sin(a) * 80 + 40), 28, Color3.fromRGB(170, 145, 105), Mat.Limestone, Color3.fromRGB(255, 170, 50))
+		K.torch(par, c + V(math.cos(a + 0.26) * 100, 0, math.sin(a + 0.26) * 100 + 40), Color3.fromRGB(255, 170, 60))
+	end
+	-- stepped temple
+	local tc = c + V(70, 0, -70)
+	for k = 0, 5 do part(par, "Step", V(80 - k * 12, 5, 80 - k * 12), CF(tc + V(0, 2.5 + k * 5, 0)), Color3.fromRGB(175, 150, 110), Mat.Limestone) end
+	part(par, "Idol", V(8, 18, 8), CF(tc + V(0, 38, 0)), Color3.fromRGB(255, 195, 60), Mat.Metal, "Ball")
+	scatter(c, 20, 215, 35, function(p) K.rock(par, p, rng:NextNumber(1, 2.4), Color3.fromRGB(170, 145, 105), Mat.Sandstone) end)
+	scatter(c, 20, 215, 20, function(p) K.deadTree(par, p, rng:NextNumber(1, 1.5), Color3.fromRGB(120, 90, 60)) end, true, ed)
+	emitter(par, c + V(0, 30, 0), V(380, 20, 380), Color3.fromRGB(255, 190, 90), 24, 3, 6, 1, 0.6, Enum.NormalId.Top)
+end
+
+AreaBuild[10] = function(c, par, ed)
+	Terrain:FillCylinder(CF(c + V(0, -10, 0)), 20, 230, Mat.Basalt)
+	hills(c, Mat.Ground, 14, 40, 200, 10, 24, -7)
+	hills(c, Mat.CrackedLava, 6, 60, 190, 6, 10, -5)
+	-- primal volcanoes and meteors
+	for i = 1, 3 do
+		local a = i / 3 * 6.283 + 0.5
+		local vc = c + V(math.cos(a) * 150, 0, math.sin(a) * 150)
+		for k = 0, 6 do Terrain:FillCylinder(CF(vc + V(0, k * 7, 0)), 8, 44 - k * 5.5, Mat.Basalt) end
+		emitter(par, vc + V(0, 52, 0), V(10, 2, 10), Color3.fromRGB(255, 130, 60), 60, 30, 2.4, 1, 1.2, Enum.NormalId.Top)
+	end
+	for i = 1, 16 do
+		local p = c + V(rng:NextNumber(-200, 200), rng:NextNumber(40, 120), rng:NextNumber(-200, 200))
+		local m = part(par, "Meteor", V(8, 8, 8) * rng:NextNumber(0.6, 1.6), CF(p), Color3.fromRGB(90, 45, 70), Mat.Basalt, "Ball", false)
+		part(par, "MeteorGlow", m.Size * 1.2, CF(p), Color3.fromRGB(255, 120, 200), Mat.Neon, "Ball", false).Transparency = 0.7
+	end
+	scatter(c, 20, 215, 45, function(p)
+		local h = rng:NextNumber(10, 24)
+		part(par, "GlowPlant", V(2, h, 2), CF(p + V(0, h / 2, 0)), Color3.fromRGB(255, 120, 200), Mat.Neon, "Ball", false)
+		part(par, "GlowLeaf", V(8, 1, 3), CF(p + V(0, h * 0.7, 0)) * A(0, rng:NextNumber(0, 6), 0.4), Color3.fromRGB(120, 255, 190), Mat.Neon, "Ball", false)
+	end)
+	scatter(c, 20, 215, 30, function(p) K.rock(par, p, rng:NextNumber(1, 2.8), Color3.fromRGB(70, 40, 60), Mat.Basalt) end)
+	K.skull(par, c + V(0, 0, -20), 3.2, Color3.fromRGB(205, 190, 170), 0)
+	emitter(par, c + V(0, 50, 0), V(380, 80, 380), Color3.fromRGB(255, 150, 200), 40, 1.5, 8, 1, 0.9, Enum.NormalId.Top)
+end
+
+---------------------------------------------------------------- spawn + eggs
+local function buildEgg(par, cf, area, titanic)
+	local theme = area.theme
+	local m = Instance.new("Model") m.Name = "EggStand" m.Parent = par
+	local big = titanic and 1.35 or 1
+	part(m, "Base", V(2, 16, 16) * V(1, big, big), cf * CF(0, 0.6, 0) * A(0, 0, math.pi / 2), Color3.fromRGB(70, 72, 82), Mat.Concrete, "Cyl")
+	part(m, "Ring", V(0.5, 14, 14) * V(1, big, big), cf * CF(0, 1.6, 0) * A(0, 0, math.pi / 2), theme.glow, Mat.Neon, "Cyl", false)
+	local egg = part(m, "Egg", V(8, 10.5, 8) * big, cf * CF(0, 8 * big, 0), rc(theme.c2, 0.1), Mat.Glass == nil and Mat.SmoothPlastic or Mat.SmoothPlastic, "Ball", false)
+	egg.Name = "Egg"
+	for i = 1, 8 do
+		local a = i / 8 * 6.283 + rng:NextNumber(0, 1)
+		local y = rng:NextNumber(-3, 3.5)
+		local r = 4 * big * math.sqrt(math.max(0.05, 1 - (y / (5.25 * big)) ^ 2))
+		part(m, "Spot", V(1.4, 1.4, 1.4) * big, cf * CF(math.cos(a) * r * 0.97, 8 * big + y * big, math.sin(a) * r * 0.97), theme.c1, Mat.SmoothPlastic, "Ball", false)
+	end
+	local l = Instance.new("PointLight") l.Color = theme.glow l.Range = 18 l.Brightness = titanic and 3 or 1.2 l.Parent = egg
+	if titanic then
+		part(m, "Beam", V(1.2, 70, 1.2), cf * CF(0, 40, 0), theme.glow, Mat.Neon, nil, false).Transparency = 0.6
+		for i = 1, 4 do
+			local a = i / 4 * 6.283
+			part(m, "Crown", V(1.2, 5, 1.2) * big, cf * CF(math.cos(a) * 6, 2.5, math.sin(a) * 6), Color3.fromRGB(255, 215, 70), Mat.Neon, "Ball", false)
+		end
+	end
+	local sign = part(m, "Sign", V(1, 1, 1), cf * CF(0, 18 * big + 3, 0), Color3.new(1, 1, 1), Mat.SmoothPlastic, nil, false)
+	sign.Transparency = 1
+	local gui = Instance.new("BillboardGui")
+	gui.Name = "SignGui" gui.Size = UDim2.fromOffset(240, 70) gui.StudsOffset = Vector3.new(0, 1, 0) gui.MaxDistance = 90 gui.Adornee = sign gui.AlwaysOnTop = false
+	gui.Parent = sign
+	local t1 = Instance.new("TextLabel")
+	t1.Name = "Title" t1.BackgroundTransparency = 1 t1.Size = UDim2.new(1, 0, 0.55, 0) t1.Font = Enum.Font.FredokaOne t1.TextScaled = true
+	t1.TextColor3 = titanic and Color3.fromRGB(255, 215, 80) or Color3.new(1, 1, 1) t1.TextStrokeTransparency = 0 t1.Text = Config.Eggs[area.egg].display t1.Parent = gui
+	local t2 = Instance.new("TextLabel")
+	t2.Name = "Price" t2.BackgroundTransparency = 1 t2.Position = UDim2.fromScale(0, 0.55) t2.Size = UDim2.new(1, 0, 0.45, 0) t2.Font = Enum.Font.FredokaOne t2.TextScaled = true
+	t2.TextColor3 = Color3.fromRGB(255, 225, 80) t2.TextStrokeTransparency = 0 t2.Text = "🪙 " .. Config.Format(Config.Eggs[area.egg].price) .. (titanic and "  ★ TITANIC" or "") t2.Parent = gui
+	m:SetAttribute("EggId", area.egg)
+	m.PrimaryPart = egg
+	return m
+end
+
+local function buildSpawn(par)
+	local R = Config.World.SpawnRadius
+	Terrain:FillCylinder(CF(0, -10, 0), 20, R + 25, Mat.Grass)
+	hills(V(0, 0, 0), Mat.Grass, 14, R - 5, R + 15, 8, 14, -7)
+	part(par, "Plaza", V(2, 190, 190), CF(0, 0.15, 0) * A(0, 0, math.pi / 2), Color3.fromRGB(225, 220, 205), Mat.Marble, "Cyl")
+	part(par, "PlazaRing", V(2.2, 198, 198), CF(0, 0.05, 0) * A(0, 0, math.pi / 2), Color3.fromRGB(120, 115, 105), Mat.Cobblestone, "Cyl")
+	part(par, "PlazaInner", V(2.4, 100, 100), CF(0, 0.3, 0) * A(0, 0, math.pi / 2), Color3.fromRGB(190, 180, 150), Mat.Sandstone, "Cyl")
+	-- central landmark: dragon + dino fountain
+	part(par, "FountainBase", V(3, 36, 36), CF(0, 1.5, 0) * A(0, 0, math.pi / 2), Color3.fromRGB(170, 165, 155), Mat.Marble, "Cyl")
+	Terrain:FillCylinder(CF(0, 1.5, 0), 1, 14, Mat.Water)
+	part(par, "FountainWater", V(0.6, 32, 32), CF(0, 3.2, 0) * A(0, 0, math.pi / 2), Color3.fromRGB(80, 170, 255), Mat.Glass, "Cyl", false).Transparency = 0.35
+	part(par, "Pedestal", V(4, 4, 4), CF(0, 8, 0), Color3.fromRGB(150, 145, 135), Mat.Marble, "Cyl").CFrame = CF(0, 8, 0) * A(0, 0, math.pi / 2)
+	K.skull(par, V(0, 12, 0), 1.0, Color3.fromRGB(235, 228, 205), 0)
+	emitter(par, V(0, 14, 0), V(4, 1, 4), Color3.fromRGB(150, 210, 255), 90, 14, 1.8, 0.4, 0.8, Enum.NormalId.Top)
+	-- big gateway welcome arch at the plaza edge facing the first road
+	K.arch(par, CF(0, 0, 112) * A(0, math.pi, 0), 36, 26, Color3.fromRGB(200, 190, 170), Mat.Cobblestone, Color3.fromRGB(255, 220, 120))
+	-- lamps around plaza
+	for i = 1, 20 do
+		local a = i / 20 * 6.283
+		local p = V(math.cos(a) * 88, 0, math.sin(a) * 88)
+		part(par, "LampPost", V(0.8, 9, 0.8), CF(p + V(0, 4.5, 0)), Color3.fromRGB(60, 60, 65), Mat.Metal)
+		local g = part(par, "Lamp", V(2, 2, 2), CF(p + V(0, 9.5, 0)), Color3.fromRGB(255, 235, 170), Mat.Neon, "Ball", false)
+		local l = Instance.new("PointLight") l.Range = 22 l.Brightness = 1.2 l.Color = Color3.fromRGB(255, 225, 150) l.Parent = g
+	end
+	-- trees around plaza edge
+	for i = 1, 26 do
+		local a = i / 26 * 6.283 + 0.1
+		local r = R + 4
+		local p = V(math.cos(a) * r, 0, math.sin(a) * r)
+		p = V(p.X, groundY(p.X, p.Z), p.Z)
+		K.oak(par, p, rng:NextNumber(1.2, 1.8), Color3.fromRGB(100, 185, 80))
+	end
+	emitter(par, V(0, 40, 0), V(220, 2, 220), Color3.fromRGB(255, 255, 255), 8, 1, 8, 0.8, 0.4)
+	-- egg stands
+	local eggs = Instance.new("Folder") eggs.Name = "Eggs" eggs.Parent = par
+	local stands = {}
+	for i, id in ipairs(Config.EggOrder) do
+		local e = Config.Eggs[id]
+		local a = (i - 1) / 10 * 6.283 + 0.314
+		local p = V(math.cos(a) * 62, 0.3, math.sin(a) * 62)
+		local cf = CF(p) * A(0, -a - math.pi / 2, 0)
+		local m = buildEgg(eggs, cf, Config.Areas[e.area], id == "ShadowRealm" or id == "DragonSanctuary" or id == "PrimalDimension")
+		stands[id] = m
+	end
+	return stands
+end
+
+local function makeRoad(par, from, to, width)
+	local d = to - from
+	local len = d.Magnitude
+	local mid = (from + to) / 2
+	local look = CF(mid, mid + d)
+	Terrain:FillBlock(CF(mid + V(0, -4, 0)) * (look - look.Position), V(width + 24, 8, len + 6), Mat.Grass)
+	local n = math.floor(len / 24)
+	for i = 0, n - 1 do
+		local c0 = from + d * ((i + 0.5) / n)
+		part(par, "Road", V(width, 0.5, len / n + 0.5), CF(c0 + V(0, 0.25, 0), c0 + d + V(0, 0.25, 0)), Color3.fromRGB(150, 140, 125), Mat.Cobblestone)
+	end
+	for i = 0, n, 2 do
+		for _, s in ipairs({-1, 1}) do
+			local c0 = from + d * (i / n)
+			local side = d.Unit:Cross(V(0, 1, 0)) * s * (width / 2 + 3)
+			local g = part(par, "RoadLight", V(1.2, 1.2, 1.2), CF(c0 + side + V(0, 2.5, 0)), Color3.fromRGB(255, 235, 170), Mat.Neon, "Ball", false)
+			part(par, "RoadPost", V(0.6, 5, 0.6), CF(c0 + side + V(0, 2.5, 0)), Color3.fromRGB(60, 60, 60), Mat.Metal)
+		end
+	end
+end
+
+---------------------------------------------------------------- BUILD
+function W.Build()
+	local world = Instance.new("Folder") world.Name = "World" world.Parent = workspace
+	local result = {Stands = {}, Barriers = {}, AreaSpawns = {}, EnemySpawns = {}, Prompts = {}}
+
+	-- ocean so the islands feel like a world
+	Terrain:FillBlock(CF(0, -6, 0), V(2400, 8, 2400), Mat.Water)
+
+	-- spawn location
+	local spawn = Instance.new("SpawnLocation")
+	spawn.Name = "SpawnLocation" spawn.Anchored = true spawn.Size = V(12, 1, 12) spawn.CFrame = CF(0, 0.6, 30)
+	spawn.Transparency = 1 spawn.CanCollide = false spawn.Neutral = true spawn.Duration = 0 spawn.Parent = workspace
+	result.SpawnCF = CF(0, 4, 30)
+
+	local spawnFolder = Instance.new("Folder") spawnFolder.Name = "Spawn" spawnFolder.Parent = world
+	result.Stands = buildSpawn(spawnFolder)
+	task.wait()
+
+	local roads = Instance.new("Folder") roads.Name = "Roads" roads.Parent = world
+	for i = 1, 10 do
+		local c = Config.AreaCenter(i)
+		local dirToSpawn = (-c).Unit
+		local par = Instance.new("Folder") par.Name = "Area" .. i par.Parent = world
+		local ed = dirToSpawn -- entrance direction (from area centre toward spawn)
+		-- road from spawn plaza to area gate
+		local gatePos = c + ed * (Config.World.AreaRadius - 12)
+		makeRoad(roads, dirToSpawn * -1 * 0 + (c.Unit * (Config.World.SpawnRadius - 5)), gatePos, 18)
+		task.wait()
+		AreaBuild[i](c, par, ed)
+		-- gate
+		local theme = Config.Areas[i].theme
+		local gcf = CF(gatePos + V(0, 0, 0), gatePos + dirToSpawn * 50)
+		K.arch(par, gcf, 30, 28, theme.c1, theme.mat, theme.glow)
+		local barrier = part(par, "Barrier", V(30, 26, 2), gcf * CF(0, 13, 0), theme.glow, Mat.ForceField, nil, true)
+		barrier.Transparency = 0.15
+		local prompt = Instance.new("ProximityPrompt")
+		prompt.ActionText = "Unlock " .. Config.Areas[i].name
+		prompt.ObjectText = "🪙 " .. Config.Format(Config.Areas[i].cost)
+		prompt.HoldDuration = 0.3 prompt.MaxActivationDistance = 22 prompt.RequiresLineOfSight = false
+		prompt.Parent = barrier
+		barrier:SetAttribute("Area", i)
+		-- sign
+		local sg = part(par, "GateSign", V(1, 1, 1), gcf * CF(0, 40, 0), Color3.new(1, 1, 1), Mat.SmoothPlastic, nil, false)
+		sg.Transparency = 1
+		local gui = Instance.new("BillboardGui") gui.Size = UDim2.fromOffset(340, 80) gui.MaxDistance = 400 gui.Adornee = sg gui.Parent = sg
+		local lb = Instance.new("TextLabel") lb.BackgroundTransparency = 1 lb.Size = UDim2.fromScale(1, 1) lb.Font = Enum.Font.FredokaOne lb.TextScaled = true
+		lb.TextColor3 = theme.glow lb.TextStrokeTransparency = 0 lb.Text = Config.Areas[i].name lb.Parent = gui
+		if i == 1 then barrier.CanCollide = false barrier.Transparency = 1 prompt.Enabled = false end
+		result.Barriers[i] = barrier
+		result.Prompts[i] = prompt
+		result.AreaSpawns[i] = CF(gatePos - ed * 28 + V(0, 5, 0), gatePos - ed * 28 + V(0, 5, 0) + dirToSpawn * -50)
+		-- enemy spawn points (ring spread)
+		local list = {}
+		local def = Config.Areas[i].enemies
+		local placed = {}
+		for k = 1, 16 do
+			local tier = (k == 1) and 4 or ((k <= 5) and 3 or ((k <= 10) and 2 or 1))
+			for tries = 1, 25 do
+				local a = rng:NextNumber(0, 6.283) local r = rng:NextNumber(45, 185)
+				local p = c + V(math.cos(a) * r, 0, math.sin(a) * r)
+				local ok = (p - c).Unit:Dot(ed) < 0.9 or r < 100
+				for _, q in ipairs(placed) do if (q - p).Magnitude < 28 then ok = false break end end
+				if ok then
+					placed[#placed + 1] = p
+					p = V(p.X, groundY(p.X, p.Z), p.Z)
+					list[#list + 1] = {pos = p, tier = tier, def = def[tier], face = (c - p).Unit}
+					break
+				end
+			end
+		end
+		result.EnemySpawns[i] = list
+		task.wait()
+	end
+	-- dock the decoration lights: make sure area 6 spawn is inside the dome
+	return result
+end
+
+return W
+]]></ProtectedString></Properties></Item></Item><Item class="StarterPlayer" referent="RBX18"><Properties><string name="Name">StarterPlayer</string></Properties><Item class="StarterPlayerScripts" referent="RBX17"><Properties><string name="Name">StarterPlayerScripts</string></Properties><Item class="LocalScript" referent="RBX8"><Properties><string name="Name">Client</string><ProtectedString name="Source"><![CDATA[-- Client (LocalScript) | StarterPlayer.StarterPlayerScripts.Client
+local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+local S = require(script:WaitForChild("Shared"))
+local UI = require(script:WaitForChild("UI"))
+require(script:WaitForChild("Pets"))
+require(script:WaitForChild("WorldClient"))
+require(script:WaitForChild("Hatch"))
+local Starter = require(script:WaitForChild("Starter"))
+require(script:WaitForChild("Ride"))
+
+local camera = workspace.CurrentCamera
+
+-- camera shake (stomps, hatches, titanic announcements)
+RunService:BindToRenderStep("BBShake", Enum.RenderPriority.Camera.Value + 5, function(dt)
+	local a = S.shakeAmp
+	if a > 0.01 then
+		camera.CFrame = camera.CFrame * CFrame.new((math.random() - 0.5) * a, (math.random() - 0.5) * a, 0) * CFrame.Angles(0, 0, (math.random() - 0.5) * a * 0.02)
+		S.shakeAmp = a * math.exp(-dt * 5)
+	else
+		S.shakeAmp = 0
+	end
+end)
+
+-- optional background music (set Config.MusicId)
+local music
+if S.Config.MusicId ~= "" then
+	music = Instance.new("Sound")
+	music.SoundId = S.Config.MusicId
+	music.Looped = true
+	music.Volume = 0.25
+	music.Parent = SoundService
+	music:Play()
+end
+S.on("MusicVolume", function(v) if music then music.Volume = v * 0.5 end end)
+
+local started = false
+S.on("Data", function(d)
+	if music then music.Volume = d.settings.music * 0.5 end
+	if not started then
+		started = true
+		if not d.starter then Starter.run() end
+	end
+end)
+
+-- the Data event may have fired before this script connected: ask for it until it arrives
+task.spawn(function()
+	local t = os.clock()
+	while not S.data and os.clock() - t < 60 do
+		S.invoke("RequestData")
+		task.wait(1)
+	end
+end)
+]]></ProtectedString></Properties><Item class="ModuleScript" referent="RBX1"><Properties><string name="Name">Shared</string><ProtectedString name="Source"><![CDATA[-- Shared (ModuleScript) | StarterPlayerScripts.Client.Shared
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
+local Debris = game:GetService("Debris")
+local TweenService = game:GetService("TweenService")
+
+local S = {}
+S.player = Players.LocalPlayer
+S.Config = require(RS:WaitForChild("Config"))
+S.MB = require(RS:WaitForChild("ModelBuilder"))
+S.fmt = S.Config.Format
+S.TS = TweenService
+S.shakeAmp = 0
+S.pal = {
+	bg = Color3.fromRGB(26, 28, 50), panel = Color3.fromRGB(40, 45, 80), panel2 = Color3.fromRGB(55, 62, 108),
+	acc = Color3.fromRGB(255, 200, 60), good = Color3.fromRGB(80, 210, 110), bad = Color3.fromRGB(235, 80, 80),
+	blue = Color3.fromRGB(70, 140, 255), text = Color3.fromRGB(255, 255, 255), dim = Color3.fromRGB(170, 175, 205),
+}
+
+local Remotes = RS:WaitForChild("Remotes")
+S.R = {}
+for _, n in ipairs({"Data", "Notify", "PetHit", "Damage", "Defeated", "Coin", "Announce", "Fx", "Select"}) do
+	S.R[n] = Remotes:WaitForChild(n)
+end
+local Act = Remotes:WaitForChild("Act")
+function S.invoke(action, a, b)
+	local ok, res = pcall(function() return Act:InvokeServer(action, a, b) end)
+	if ok then return res end
+	return nil
+end
+
+-- tiny signal bus
+local listeners = {}
+function S.on(name, fn)
+	listeners[name] = listeners[name] or {}
+	table.insert(listeners[name], fn)
+end
+function S.emit(name, ...)
+	for _, fn in ipairs(listeners[name] or {}) do task.spawn(fn, ...) end
+end
+
+S.data = nil
+S.R.Data.OnClientEvent:Connect(function(d)
+	S.data = d
+	S.emit("Data", d)
+end)
+
+---------------------------------------------------------------- ui helpers
+function S.mk(class, props, kids)
+	local o = Instance.new(class)
+	local parent = props and props.Parent
+	for k, v in pairs(props or {}) do
+		if k ~= "Parent" then o[k] = v end
+	end
+	for _, c in ipairs(kids or {}) do c.Parent = o end
+	if parent then o.Parent = parent end
+	return o
+end
+function S.round(o, r)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, r or 12)
+	c.Parent = o
+	return c
+end
+function S.stroke(o, color, th)
+	local s = Instance.new("UIStroke")
+	s.Color = color or Color3.new(0, 0, 0)
+	s.Thickness = th or 2
+	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	s.Parent = o
+	return s
+end
+function S.label(parent, text, size, color, props)
+	local p = {Parent = parent, BackgroundTransparency = 1, Text = text, TextColor3 = color or S.pal.text, Font = Enum.Font.FredokaOne, TextSize = size or 18, TextWrapped = true}
+	for k, v in pairs(props or {}) do p[k] = v end
+	local l = S.mk("TextLabel", p)
+	return l
+end
+function S.button(parent, text, color, size, pos, cb, props)
+	local p = {Parent = parent, Text = text, Size = size, Position = pos, BackgroundColor3 = color or S.pal.blue, TextColor3 = Color3.new(1, 1, 1), Font = Enum.Font.FredokaOne, TextSize = 20, AutoButtonColor = true, TextWrapped = true}
+	for k, v in pairs(props or {}) do p[k] = v end
+	local b = S.mk("TextButton", p)
+	S.round(b, 12)
+	S.stroke(b, Color3.new(0, 0, 0), 2)
+	local ts = Instance.new("UITextSizeConstraint") ts.MaxTextSize = p.TextSize ts.Parent = b
+	b.MouseButton1Click:Connect(function()
+		S.sfx("Click", 0.4)
+		if cb then cb(b) end
+	end)
+	return b
+end
+
+function S.petName(name) return S.Config.Pets[name].display end
+function S.rarityColor(name)
+	return S.Config.Rarities[S.Config.Pets[name].rarity].color
+end
+
+-- static icon of a pet in a ViewportFrame
+function S.petIcon(parent, name, props, dark)
+	local vp = S.mk("ViewportFrame", {Parent = parent, Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Ambient = dark and Color3.new(0, 0, 0) or Color3.fromRGB(170, 170, 185), LightColor = dark and Color3.new(0, 0, 0) or Color3.new(1, 1, 1), LightDirection = Vector3.new(-0.6, -0.8, -0.5)})
+	for k, v in pairs(props or {}) do vp[k] = v end
+	local rig = S.MB.Pet(name)
+	rig.model.Parent = vp
+	local cf, size = rig.model:GetBoundingBox()
+	local r = math.max(size.X, size.Y, size.Z)
+	local cam = Instance.new("Camera")
+	cam.FieldOfView = 40
+	local center = cf.Position
+	local dist = r * 1.55
+	cam.CFrame = CFrame.lookAt(center + Vector3.new(-0.8, 0.45, -1).Unit * dist, center)
+	cam.Parent = vp
+	vp.CurrentCamera = cam
+	if dark then
+		for _, p in ipairs(rig.model:GetDescendants()) do
+			if p:IsA("BasePart") then p.Color = Color3.new(0, 0, 0) p.Material = Enum.Material.SmoothPlastic end
+		end
+	end
+	return vp, rig, cam
+end
+
+---------------------------------------------------------------- sound + fx
+local Terrain = workspace.Terrain
+function S.sfx(key, vol, pitch, pos)
+	local id = S.Config.Sounds[key]
+	if not id then return end
+	local snd = Instance.new("Sound")
+	snd.SoundId = id
+	snd.Volume = (vol or 0.6) * ((S.data and S.data.settings.sfx) or 0.8)
+	snd.PlaybackSpeed = pitch or 1
+	local holder
+	if pos then
+		holder = Instance.new("Attachment")
+		holder.WorldPosition = pos
+		holder.Parent = Terrain
+		snd.RollOffMaxDistance = 220
+		snd.RollOffMinDistance = 20
+		snd.Parent = holder
+	else
+		snd.Parent = SoundService
+	end
+	snd:Play()
+	Debris:AddItem(holder or snd, 6)
+end
+
+function S.burst(pos, color, count, size, speed, life)
+	local a = Instance.new("Attachment")
+	a.WorldPosition = pos
+	a.Parent = Terrain
+	local e = Instance.new("ParticleEmitter")
+	e.Color = ColorSequence.new(color)
+	e.Lifetime = NumberRange.new((life or 0.6) * 0.7, life or 0.6)
+	e.Speed = NumberRange.new((speed or 20) * 0.5, speed or 20)
+	e.SpreadAngle = Vector2.new(180, 180)
+	e.LightEmission = 0.7
+	e.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, size or 1), NumberSequenceKeypoint.new(1, 0)})
+	e.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
+	e.Rate = 0
+	e.Drag = 3
+	e.Parent = a
+	e:Emit(count or 15)
+	Debris:AddItem(a, (life or 0.6) + 1)
+end
+
+function S.groundY(char)
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	if not hum or not hrp then return nil end
+	local y = hrp.Position.Y - hum.HipHeight - hrp.Size.Y / 2
+	if hum.RigType == Enum.HumanoidRigType.R6 then y = y - 2 end
+	return y
+end
+
+return S
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX2"><Properties><string name="Name">UI</string><ProtectedString name="Source"><![CDATA[-- UI (ModuleScript) | StarterPlayerScripts.Client.UI
+local S = require(script.Parent.Shared)
+local Config, pal, mk, round, stroke, label, button = S.Config, S.pal, S.mk, S.round, S.stroke, S.label, S.button
+local UIS = game:GetService("UserInputService")
+local TS = S.TS
+local UI = {}
+
+local gui = mk("ScreenGui", {Name = "BeastboundUI", ResetOnSpawn = false, IgnoreGuiInset = true, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 5, Parent = S.player:WaitForChild("PlayerGui")})
+local root = mk("Frame", {Name = "Root", BackgroundTransparency = 1, Parent = gui})
+local uiscale = mk("UIScale", {Parent = root})
+local function relayout()
+	local vp = gui.AbsoluteSize
+	if vp.X < 10 then return end
+	local s = math.clamp(math.min(vp.X / 950, vp.Y / 520), 0.5, 1.6)
+	uiscale.Scale = s
+	root.Size = UDim2.fromOffset(vp.X / s, vp.Y / s)
+end
+gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(relayout)
+relayout()
+UI.gui, UI.root = gui, root
+UI.touch = UIS.TouchEnabled
+
+---------------------------------------------------------------- toasts
+local toastList = mk("Frame", {Parent = root, BackgroundTransparency = 1, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 62), Size = UDim2.fromOffset(420, 200), ZIndex = 50})
+mk("UIListLayout", {Parent = toastList, Padding = UDim.new(0, 4), HorizontalAlignment = Enum.HorizontalAlignment.Center})
+function UI.toast(text, kind)
+	local c = kind == "good" and pal.good or (kind == "error" and pal.bad or pal.blue)
+	local t = label(toastList, text, 18, Color3.new(1, 1, 1), {Size = UDim2.fromOffset(380, 30), BackgroundTransparency = 0.15, BackgroundColor3 = c})
+	round(t, 10) stroke(t)
+	task.delay(3, function()
+		TS:Create(t, TweenInfo.new(0.4), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+		task.wait(0.45) t:Destroy()
+	end)
+end
+S.R.Notify.OnClientEvent:Connect(UI.toast)
+
+---------------------------------------------------------------- HUD
+local coinBox = mk("Frame", {Parent = root, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 8), Size = UDim2.fromOffset(240, 44), BackgroundColor3 = pal.bg})
+round(coinBox, 22) stroke(coinBox, Color3.fromRGB(255, 200, 60), 3)
+local coinIcon = label(coinBox, "🪙", 28, nil, {Size = UDim2.fromOffset(44, 44)})
+local coinText = label(coinBox, "0", 26, pal.acc, {Position = UDim2.fromOffset(44, 0), Size = UDim2.new(1, -54, 1, 0), TextXAlignment = Enum.TextXAlignment.Left})
+UI.coinIcon = coinIcon
+local shownCoins = 0
+local function setCoins(v)
+	coinText.Text = S.fmt(v)
+	coinBox.Size = UDim2.fromOffset(260, 48)
+	TS:Create(coinBox, TweenInfo.new(0.2, Enum.EasingStyle.Back), {Size = UDim2.fromOffset(240, 44)}):Play()
+end
+
+local areaBox = mk("Frame", {Parent = root, Position = UDim2.fromOffset(10, 8), Size = UDim2.fromOffset(250, 54), BackgroundColor3 = pal.bg})
+round(areaBox, 14) stroke(areaBox, pal.blue, 3)
+local areaName = label(areaBox, "Spawn", 22, pal.acc, {Size = UDim2.new(1, -10, 0.55, 0), Position = UDim2.fromOffset(8, 2), TextXAlignment = Enum.TextXAlignment.Left})
+local areaSub = label(areaBox, "", 14, pal.dim, {Size = UDim2.new(1, -10, 0.4, 0), Position = UDim2.new(0, 8, 0.58, 0), TextXAlignment = Enum.TextXAlignment.Left})
+function UI.setArea(i)
+	if i == 0 then
+		areaName.Text = "Main Spawn" areaSub.Text = "Hatch eggs here!"
+		return
+	end
+	local a = Config.Areas[i]
+	areaName.Text = a.name
+	areaName.TextColor3 = a.theme.glow
+	areaSub.Text = "Enemy HP " .. S.fmt(a.hp) .. "+  |  Coins " .. S.fmt(a.reward) .. "+"
+end
+UI.setArea(0)
+
+-- panels
+local panels = {}
+local current
+local function closeAll()
+	for n, p in pairs(panels) do p.frame.Visible = false end
+	current = nil
+end
+function UI.panel(name, w, h, title)
+	local f = mk("Frame", {Name = name, Parent = root, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.52), Size = UDim2.fromOffset(w, h), BackgroundColor3 = pal.panel, Visible = false, ZIndex = 10})
+	round(f, 18) stroke(f, Color3.fromRGB(15, 15, 30), 4)
+	local sc = mk("UIScale", {Parent = f})
+	local bar = mk("Frame", {Parent = f, Size = UDim2.new(1, 0, 0, 44), BackgroundColor3 = pal.panel2, ZIndex = 11})
+	round(bar, 18)
+	mk("Frame", {Parent = bar, Position = UDim2.new(0, 0, 1, -16), Size = UDim2.new(1, 0, 0, 16), BackgroundColor3 = pal.panel2, BorderSizePixel = 0, ZIndex = 11})
+	label(bar, title, 26, pal.acc, {Size = UDim2.new(1, -60, 1, 0), Position = UDim2.fromOffset(14, 0), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12})
+	button(bar, "X", pal.bad, UDim2.fromOffset(38, 34), UDim2.new(1, -44, 0, 5), function() closeAll() end, {ZIndex = 13})
+	local p = {frame = f, scale = sc}
+	panels[name] = p
+	return f, p
+end
+function UI.open(name)
+	if current == name then closeAll() return end
+	closeAll()
+	local p = panels[name]
+	if not p then return end
+	current = name
+	p.frame.Visible = true
+	p.scale.Scale = 0.8
+	TS:Create(p.scale, TweenInfo.new(0.25, Enum.EasingStyle.Back), {Scale = 1}):Play()
+	if p.onOpen then p.onOpen() end
+end
+function UI.close() closeAll() end
+function UI.isOpen(name) return current == name end
+function UI.onOpen(name, fn) panels[name].onOpen = fn end
+
+-- side buttons
+local side = mk("Frame", {Parent = root, AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(74, 330), BackgroundTransparency = 1})
+mk("UIListLayout", {Parent = side, Padding = UDim.new(0, 8), VerticalAlignment = Enum.VerticalAlignment.Center})
+local function sideBtn(emoji, text, color, panelName)
+	local b = mk("TextButton", {Parent = side, Size = UDim2.fromOffset(72, 72), BackgroundColor3 = color, Text = "", AutoButtonColor = true})
+	round(b, 16) stroke(b, Color3.new(0, 0, 0), 3)
+	label(b, emoji, 34, nil, {Size = UDim2.new(1, 0, 0.65, 0)})
+	label(b, text, 14, nil, {Size = UDim2.new(1, 0, 0.3, 0), Position = UDim2.fromScale(0, 0.66), TextStrokeTransparency = 0.5})
+	b.MouseButton1Click:Connect(function() S.sfx("Click", 0.4) UI.open(panelName) end)
+	return b
+end
+sideBtn("🎒", "Pets", Color3.fromRGB(70, 130, 240), "Inventory")
+sideBtn("📖", "Index", Color3.fromRGB(150, 90, 230), "Index")
+sideBtn("🗺️", "Areas", Color3.fromRGB(60, 190, 110), "Areas")
+sideBtn("⚙️", "Settings", Color3.fromRGB(120, 125, 150), "Settings")
+
+-- equipped bar
+local eqBar = mk("Frame", {Parent = root, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -8), Size = UDim2.fromOffset(280, 66), BackgroundColor3 = pal.bg, BackgroundTransparency = 0.2})
+round(eqBar, 14) stroke(eqBar, Color3.new(0, 0, 0), 3)
+mk("UIListLayout", {Parent = eqBar, FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Center, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 6)})
+local function refreshEq()
+	for _, c in ipairs(eqBar:GetChildren()) do if c:IsA("Frame") then c:Destroy() end end
+	local d = S.data
+	if not d then return end
+	for i = 1, Config.MaxEquipped do
+		local name = d.equipped[i]
+		local slot = mk("Frame", {Parent = eqBar, Size = UDim2.fromOffset(58, 58), BackgroundColor3 = pal.panel, LayoutOrder = i})
+		round(slot, 10)
+		stroke(slot, name and S.rarityColor(name) or Color3.fromRGB(20, 20, 30), 3)
+		if name then
+			S.petIcon(slot, name)
+			local b = mk("TextButton", {Parent = slot, Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Text = ""})
+			b.MouseButton1Click:Connect(function() S.invoke("Unequip", i) end)
+		else
+			label(slot, "+", 26, pal.dim, {Size = UDim2.fromScale(1, 1)})
+		end
+	end
+end
+
+---------------------------------------------------------------- inventory
+local inv, invp = UI.panel("Inventory", 700, 420, "🎒 My Creatures")
+local searchBox = mk("TextBox", {Parent = inv, Position = UDim2.fromOffset(12, 52), Size = UDim2.fromOffset(190, 32), BackgroundColor3 = pal.bg, PlaceholderText = "🔍 Search...", Text = "", TextColor3 = Color3.new(1, 1, 1), PlaceholderColor3 = pal.dim, Font = Enum.Font.GothamBold, TextSize = 16, ClearTextOnFocus = false, ZIndex = 11})
+round(searchBox, 10)
+local sortMode = 1
+local sortNames = {"Sort: Damage", "Sort: Rarity", "Sort: Name", "Sort: Count"}
+local rebuildInv
+local sortBtn = button(inv, sortNames[1], pal.blue, UDim2.fromOffset(120, 32), UDim2.fromOffset(210, 52), function(b)
+	sortMode = sortMode % 4 + 1
+	b.Text = sortNames[sortMode]
+	rebuildInv()
+end, {TextSize = 15, ZIndex = 11})
+local eqCount = label(inv, "Equipped 0/4", 18, pal.acc, {Position = UDim2.fromOffset(340, 52), Size = UDim2.fromOffset(130, 32), ZIndex = 11})
+button(inv, "Equip Best", pal.good, UDim2.fromOffset(100, 32), UDim2.fromOffset(470, 52), function() S.invoke("EquipBest") end, {TextSize = 15, ZIndex = 11})
+button(inv, "Unequip All", pal.bad, UDim2.fromOffset(100, 32), UDim2.fromOffset(576, 52), function() S.invoke("UnequipAll") end, {TextSize = 15, ZIndex = 11})
+local grid = mk("ScrollingFrame", {Parent = inv, Position = UDim2.fromOffset(12, 92), Size = UDim2.fromOffset(470, 318), BackgroundColor3 = pal.bg, BackgroundTransparency = 0.3, ScrollBarThickness = 6, CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y, ZIndex = 11, BorderSizePixel = 0})
+round(grid, 12)
+mk("UIGridLayout", {Parent = grid, CellSize = UDim2.fromOffset(104, 128), CellPadding = UDim2.fromOffset(8, 8), SortOrder = Enum.SortOrder.LayoutOrder})
+mk("UIPadding", {Parent = grid, PaddingLeft = UDim.new(0, 8), PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 8)})
+local detail = mk("Frame", {Parent = inv, Position = UDim2.fromOffset(492, 92), Size = UDim2.fromOffset(196, 318), BackgroundColor3 = pal.bg, BackgroundTransparency = 0.3, ZIndex = 11})
+round(detail, 12)
+local selected
+
+local function eqCountOf(name)
+	local n = 0
+	for _, v in ipairs(S.data.equipped) do if v == name then n = n + 1 end end
+	return n
+end
+
+local function showDetail()
+	for _, c in ipairs(detail:GetChildren()) do c:Destroy() end
+	if not selected or not S.data.owned[selected] then
+		label(detail, "Select a creature", 18, pal.dim, {Size = UDim2.fromScale(1, 1), ZIndex = 12})
+		return
+	end
+	local pet = Config.Pets[selected]
+	local iconBox = mk("Frame", {Parent = detail, Position = UDim2.fromOffset(18, 8), Size = UDim2.fromOffset(160, 120), BackgroundColor3 = pal.panel, ZIndex = 12})
+	round(iconBox, 12) stroke(iconBox, S.rarityColor(selected), 3)
+	local vp = S.petIcon(iconBox, selected)
+	vp.ZIndex = 13
+	label(detail, pet.display, 20, S.rarityColor(selected), {Position = UDim2.fromOffset(4, 132), Size = UDim2.new(1, -8, 0, 40), ZIndex = 12})
+	label(detail, pet.rarity .. (pet.titanic and "  (egg exclusive)" or ""), 14, S.rarityColor(selected), {Position = UDim2.fromOffset(4, 172), Size = UDim2.new(1, -8, 0, 18), ZIndex = 12})
+	label(detail, "⚔ Damage: " .. S.fmt(pet.dmg) .. "   |   Owned: " .. S.data.owned[selected], 14, Color3.new(1, 1, 1), {Position = UDim2.fromOffset(4, 192), Size = UDim2.new(1, -8, 0, 34), ZIndex = 12})
+	button(detail, "Equip", pal.good, UDim2.fromOffset(86, 32), UDim2.fromOffset(8, 232), function() S.invoke("Equip", selected) end, {TextSize = 16, ZIndex = 12})
+	button(detail, "Unequip", pal.bad, UDim2.fromOffset(86, 32), UDim2.fromOffset(102, 232), function()
+		for i, v in ipairs(S.data.equipped) do if v == selected then S.invoke("Unequip", i) break end end
+	end, {TextSize = 15, ZIndex = 12})
+	if pet.titanic then
+		local riding = S.player:GetAttribute("Riding") == selected
+		button(detail, riding and "⬇ Dismount" or (pet.kind == "Dragon" and "🐉 Ride & Fly!" or "🦖 Ride!"), pal.acc, UDim2.fromOffset(180, 34), UDim2.fromOffset(8, 274), function()
+			S.invoke("Ride", riding and "" or selected)
+			UI.close()
+		end, {TextSize = 17, ZIndex = 12, TextColor3 = Color3.new(0, 0, 0)})
+	end
+end
+
+local rarOrder = Config.Rarities
+rebuildInv = function()
+	if not S.data then return end
+	for _, c in ipairs(grid:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end end
+	local list = {}
+	local q = searchBox.Text:lower()
+	for name, n in pairs(S.data.owned) do
+		local pet = Config.Pets[name]
+		if q == "" or pet.display:lower():find(q, 1, true) or pet.rarity:lower():find(q, 1, true) then list[#list + 1] = name end
+	end
+	table.sort(list, function(a, b)
+		local pa, pb = Config.Pets[a], Config.Pets[b]
+		if sortMode == 1 then if pa.dmg ~= pb.dmg then return pa.dmg > pb.dmg end
+		elseif sortMode == 2 then local ra, rb = rarOrder[pa.rarity].order, rarOrder[pb.rarity].order if ra ~= rb then return ra > rb end
+		elseif sortMode == 4 then if S.data.owned[a] ~= S.data.owned[b] then return S.data.owned[a] > S.data.owned[b] end end
+		if sortMode == 3 then return pa.display < pb.display end
+		return pa.display < pb.display
+	end)
+	for i, name in ipairs(list) do
+		local pet = Config.Pets[name]
+		local cell = mk("TextButton", {Parent = grid, BackgroundColor3 = pal.panel, Text = "", LayoutOrder = i, ZIndex = 12})
+		round(cell, 12)
+		stroke(cell, S.rarityColor(name), 3)
+		local ib = mk("Frame", {Parent = cell, Size = UDim2.new(1, -8, 0, 76), Position = UDim2.fromOffset(4, 4), BackgroundTransparency = 1, ZIndex = 12})
+		local vp = S.petIcon(ib, name) vp.ZIndex = 13
+		label(cell, pet.display, 13, Color3.new(1, 1, 1), {Position = UDim2.fromOffset(2, 82), Size = UDim2.new(1, -4, 0, 28), ZIndex = 13})
+		label(cell, "⚔ " .. S.fmt(pet.dmg), 13, pal.acc, {Position = UDim2.fromOffset(2, 110), Size = UDim2.new(1, -4, 0, 16), ZIndex = 13})
+		if S.data.owned[name] > 1 then label(cell, "x" .. S.data.owned[name], 14, Color3.new(1, 1, 1), {Position = UDim2.new(1, -34, 0, 4), Size = UDim2.fromOffset(30, 16), TextXAlignment = Enum.TextXAlignment.Right, ZIndex = 14, TextStrokeTransparency = 0}) end
+		local n = eqCountOf(name)
+		if n > 0 then label(cell, "✔" .. (n > 1 and n or ""), 16, pal.good, {Position = UDim2.fromOffset(4, 4), Size = UDim2.fromOffset(30, 18), ZIndex = 14, TextStrokeTransparency = 0}) end
+		cell.MouseButton1Click:Connect(function()
+			S.sfx("Click", 0.4)
+			selected = name
+			showDetail()
+		end)
+	end
+	eqCount.Text = "Equipped " .. #S.data.equipped .. "/" .. Config.MaxEquipped
+	showDetail()
+end
+searchBox:GetPropertyChangedSignal("Text"):Connect(function() rebuildInv() end)
+UI.onOpen("Inventory", rebuildInv)
+
+---------------------------------------------------------------- index
+local idx = UI.panel("Index", 700, 420, "📖 Creature Index")
+local idxCount = label(idx, "", 18, pal.acc, {Position = UDim2.fromOffset(280, 8), Size = UDim2.fromOffset(300, 30), ZIndex = 12})
+local idxGrid = mk("ScrollingFrame", {Parent = idx, Position = UDim2.fromOffset(12, 52), Size = UDim2.fromOffset(676, 358), BackgroundColor3 = pal.bg, BackgroundTransparency = 0.3, ScrollBarThickness = 6, CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y, ZIndex = 11, BorderSizePixel = 0})
+round(idxGrid, 12)
+mk("UIGridLayout", {Parent = idxGrid, CellSize = UDim2.fromOffset(124, 152), CellPadding = UDim2.fromOffset(8, 8), SortOrder = Enum.SortOrder.LayoutOrder})
+mk("UIPadding", {Parent = idxGrid, PaddingLeft = UDim.new(0, 8), PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 8)})
+local idxOrder = {"StarterDino", "StarterDragon"}
+for _, id in ipairs(Config.EggOrder) do
+	for _, o in ipairs(Config.Eggs[id].odds) do idxOrder[#idxOrder + 1] = o[1] end
+end
+local function rebuildIndex()
+	if not S.data then return end
+	for _, c in ipairs(idxGrid:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end end
+	local found = 0
+	for i, name in ipairs(idxOrder) do
+		local pet = Config.Pets[name]
+		local got = S.data.discovered[name] == true
+		if got then found = found + 1 end
+		local cell = mk("Frame", {Parent = idxGrid, BackgroundColor3 = pal.panel, LayoutOrder = i, ZIndex = 12})
+		round(cell, 12)
+		stroke(cell, got and S.rarityColor(name) or Color3.fromRGB(20, 20, 30), 3)
+		local ib = mk("Frame", {Parent = cell, Size = UDim2.new(1, -8, 0, 76), Position = UDim2.fromOffset(4, 4), BackgroundTransparency = 1, ZIndex = 12})
+		local vp = S.petIcon(ib, name, nil, not got) vp.ZIndex = 13
+		label(cell, got and pet.display or "???", 13, Color3.new(1, 1, 1), {Position = UDim2.fromOffset(2, 80), Size = UDim2.new(1, -4, 0, 28), ZIndex = 13})
+		label(cell, got and (pet.rarity .. "  ⚔ " .. S.fmt(pet.dmg)) or "Undiscovered", 12, got and S.rarityColor(name) or pal.dim, {Position = UDim2.fromOffset(2, 108), Size = UDim2.new(1, -4, 0, 16), ZIndex = 13})
+		label(cell, pet.egg and Config.Eggs[pet.egg].display or "Starter", 11, pal.dim, {Position = UDim2.fromOffset(2, 126), Size = UDim2.new(1, -4, 0, 16), ZIndex = 13})
+	end
+	idxCount.Text = "Discovered " .. found .. " / " .. #idxOrder
+end
+UI.onOpen("Index", rebuildIndex)
+
+---------------------------------------------------------------- areas
+local areasF = UI.panel("Areas", 560, 440, "🗺️ Worlds")
+local aScroll = mk("ScrollingFrame", {Parent = areasF, Position = UDim2.fromOffset(12, 94), Size = UDim2.fromOffset(536, 336), BackgroundColor3 = pal.bg, BackgroundTransparency = 0.3, ScrollBarThickness = 6, CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y, ZIndex = 11, BorderSizePixel = 0})
+round(aScroll, 12)
+mk("UIListLayout", {Parent = aScroll, Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder})
+mk("UIPadding", {Parent = aScroll, PaddingLeft = UDim.new(0, 8), PaddingTop = UDim.new(0, 8), PaddingRight = UDim.new(0, 8)})
+button(areasF, "🏠 Teleport to Spawn (eggs)", pal.blue, UDim2.fromOffset(536, 34), UDim2.fromOffset(12, 52), function() S.invoke("Teleport", 0) UI.close() end, {TextSize = 18, ZIndex = 12})
+local function rebuildAreas()
+	if not S.data then return end
+	for _, c in ipairs(aScroll:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end end
+	for i, a in ipairs(Config.Areas) do
+		local unlocked = S.data.areas[tostring(i)] == true
+		local row = mk("Frame", {Parent = aScroll, Size = UDim2.new(1, 0, 0, 56), BackgroundColor3 = pal.panel, LayoutOrder = i, ZIndex = 12})
+		round(row, 12) stroke(row, a.theme.glow, 2)
+		label(row, i .. ". " .. a.name, 20, a.theme.glow, {Position = UDim2.fromOffset(10, 2), Size = UDim2.new(0.55, 0, 0, 26), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 13})
+		label(row, unlocked and "Unlocked ✔  |  " .. Config.Eggs[a.egg].display or ("🪙 " .. S.fmt(a.cost) .. (i > 1 and not S.data.areas[tostring(i - 1)] and "  (needs previous)" or "")), 14, unlocked and pal.good or pal.acc, {Position = UDim2.fromOffset(10, 28), Size = UDim2.new(0.6, 0, 0, 22), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 13})
+		if unlocked then
+			button(row, "Teleport", pal.good, UDim2.fromOffset(110, 36), UDim2.new(1, -120, 0, 10), function() S.invoke("Teleport", i) UI.close() end, {TextSize = 17, ZIndex = 13})
+		else
+			button(row, "Unlock", pal.acc, UDim2.fromOffset(110, 36), UDim2.new(1, -120, 0, 10), function() S.invoke("UnlockArea", i) end, {TextSize = 17, ZIndex = 13, TextColor3 = Color3.new(0, 0, 0)})
+		end
+	end
+end
+UI.onOpen("Areas", rebuildAreas)
+
+---------------------------------------------------------------- settings
+local setF = UI.panel("Settings", 420, 300, "⚙️ Settings")
+UI.hideOthers = false
+local function slider(y, text, key, onChange)
+	label(setF, text, 18, Color3.new(1, 1, 1), {Position = UDim2.fromOffset(20, y), Size = UDim2.fromOffset(120, 30), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 12})
+	local bar = mk("Frame", {Parent = setF, Position = UDim2.fromOffset(150, y + 8), Size = UDim2.fromOffset(240, 14), BackgroundColor3 = pal.bg, ZIndex = 12})
+	round(bar, 7)
+	local fill = mk("Frame", {Parent = bar, Size = UDim2.fromScale(0.5, 1), BackgroundColor3 = pal.acc, ZIndex = 13})
+	round(fill, 7)
+	local knob = mk("Frame", {Parent = bar, AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(22, 22), BackgroundColor3 = Color3.new(1, 1, 1), ZIndex = 14})
+	round(knob, 11) stroke(knob)
+	local dragging = false
+	local function set(frac)
+		frac = math.clamp(frac, 0, 1)
+		fill.Size = UDim2.fromScale(frac, 1)
+		knob.Position = UDim2.fromScale(frac, 0.5)
+		if S.data then S.data.settings[key] = frac end
+		onChange(frac)
+	end
+	local hit = mk("TextButton", {Parent = bar, Size = UDim2.new(1, 0, 3, 0), Position = UDim2.fromScale(0, -1), BackgroundTransparency = 1, Text = "", ZIndex = 15})
+	local function upd(input) set((input.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X) end
+	hit.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then dragging = true upd(i) end end)
+	UIS.InputChanged:Connect(function(i) if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then upd(i) end end)
+	UIS.InputEnded:Connect(function(i)
+		if dragging and (i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch) then
+			dragging = false
+			S.invoke("SetSetting", key, S.data and S.data.settings[key] or 0.5)
+		end
+	end)
+	return set
+end
+local setMusic = slider(60, "🎵 Music", "music", function(v) S.emit("MusicVolume", v) end)
+local setSfx = slider(110, "🔊 Effects", "sfx", function() end)
+local othersBtn
+othersBtn = button(setF, "Other players' pets: ON", pal.good, UDim2.fromOffset(260, 40), UDim2.fromOffset(80, 165), function(b)
+	UI.hideOthers = not UI.hideOthers
+	b.Text = "Other players' pets: " .. (UI.hideOthers and "OFF" or "ON")
+	b.BackgroundColor3 = UI.hideOthers and pal.bad or pal.good
+end, {TextSize = 17, ZIndex = 12})
+label(setF, "Tap an enemy to send your pets to fight it.\nHatch eggs at the main spawn!", 15, pal.dim, {Position = UDim2.fromOffset(20, 220), Size = UDim2.fromOffset(380, 60), ZIndex = 12})
+UI.onOpen("Settings", function()
+	if S.data then setMusic(S.data.settings.music) setSfx(S.data.settings.sfx) end
+end)
+
+---------------------------------------------------------------- announcements
+local flash = mk("Frame", {Parent = root, Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(1, 1, 1), BackgroundTransparency = 1, ZIndex = 90, Active = false})
+function UI.flash(color, t)
+	flash.BackgroundColor3 = color
+	flash.BackgroundTransparency = 0.2
+	TS:Create(flash, TweenInfo.new(t or 0.8), {BackgroundTransparency = 1}):Play()
+end
+
+local banner = mk("Frame", {Parent = root, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, -120), Size = UDim2.fromOffset(640, 90), BackgroundColor3 = Color3.fromRGB(120, 10, 20), ZIndex = 80, Visible = false})
+round(banner, 16) stroke(banner, Color3.fromRGB(255, 215, 70), 4)
+mk("UIGradient", {Parent = banner, Color = ColorSequence.new(Color3.fromRGB(255, 60, 40), Color3.fromRGB(110, 0, 120))})
+local bTitle = label(banner, "", 30, Color3.fromRGB(255, 230, 100), {Size = UDim2.new(1, -20, 0.5, 0), Position = UDim2.fromOffset(10, 4), ZIndex = 81, TextStrokeTransparency = 0})
+local bText = label(banner, "", 24, Color3.new(1, 1, 1), {Size = UDim2.new(1, -20, 0.5, 0), Position = UDim2.new(0, 10, 0.5, -2), ZIndex = 81, TextStrokeTransparency = 0})
+local bannerToken = 0
+function UI.banner(title, text, c1, c2, dur)
+	bannerToken = bannerToken + 1
+	local tok = bannerToken
+	banner.Visible = true
+	banner:FindFirstChildOfClass("UIGradient").Color = ColorSequence.new(c1, c2)
+	bTitle.Text = title bText.Text = text
+	banner.Position = UDim2.new(0.5, 0, 0, -120)
+	TS:Create(banner, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Position = UDim2.new(0.5, 0, 0, 70)}):Play()
+	task.delay(dur, function()
+		if tok ~= bannerToken then return end
+		TS:Create(banner, TweenInfo.new(0.4), {Position = UDim2.new(0.5, 0, 0, -120)}):Play()
+		task.wait(0.45)
+		if tok == bannerToken then banner.Visible = false end
+	end)
+end
+
+S.R.Announce.OnClientEvent:Connect(function(kind, user, petDisplay, extra)
+	if kind == "Titanic" then
+		UI.banner("🔥 TITANIC HATCHED! 🔥", user .. " hatched the " .. petDisplay .. "!!", Color3.fromRGB(255, 70, 40), Color3.fromRGB(110, 0, 140), 9)
+		UI.flash(Color3.fromRGB(255, 220, 120), 1.6)
+		S.sfx("Titanic", 1, 0.6)
+		S.sfx("Rare", 0.8, 0.8)
+		S.shakeAmp = math.max(S.shakeAmp, 1.2)
+	else
+		local c = Config.Rarities[extra] and Config.Rarities[extra].color or Color3.new(1, 1, 1)
+		UI.banner("✨ " .. string.upper(extra) .. " HATCH ✨", user .. " hatched " .. petDisplay, c:Lerp(Color3.new(0, 0, 0), 0.45), c:Lerp(Color3.new(0, 0, 0), 0.7), 5)
+		S.sfx("Rare", 0.5)
+	end
+end)
+
+---------------------------------------------------------------- data hooks
+S.on("Data", function(d)
+	setCoins(d.coins)
+	refreshEq()
+	if UI.isOpen("Inventory") then rebuildInv() end
+	if UI.isOpen("Areas") then rebuildAreas() end
+	if UI.isOpen("Index") then rebuildIndex() end
+end)
+
+-- riding buttons (dismount + fly up/down for touch)
+local rideFrame = mk("Frame", {Parent = root, AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -14, 1, -90), Size = UDim2.fromOffset(170, 190), BackgroundTransparency = 1, Visible = false})
+UI.rideUp = button(rideFrame, "▲ UP", pal.blue, UDim2.fromOffset(160, 50), UDim2.fromOffset(0, 0), nil, {TextSize = 22})
+UI.rideDown = button(rideFrame, "▼ DOWN", pal.blue, UDim2.fromOffset(160, 50), UDim2.fromOffset(0, 58), nil, {TextSize = 22})
+button(rideFrame, "Dismount (F)", pal.bad, UDim2.fromOffset(160, 50), UDim2.fromOffset(0, 124), function() S.invoke("Ride", "") end, {TextSize = 20})
+function UI.showRide(on, flying)
+	rideFrame.Visible = on
+	UI.rideUp.Visible = flying and true or false
+	UI.rideDown.Visible = flying and true or false
+end
+
+return UI
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX3"><Properties><string name="Name">Pets</string><ProtectedString name="Source"><![CDATA[-- Pets (ModuleScript) | StarterPlayerScripts.Client.Pets
+-- Every client renders every player's equipped creatures locally (smooth, cheap, no server replication cost).
+local S = require(script.Parent.Shared)
+local UI = require(script.Parent.UI)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Config, MB = S.Config, S.MB
+local Pets = {}
+
+local folder = Instance.new("Folder")
+folder.Name = "ClientPets"
+folder.Parent = workspace
+local state = {}
+local camera = workspace.CurrentCamera
+
+local function angleLerp(a, b, t)
+	local d = (b - a + math.pi) % (math.pi * 2) - math.pi
+	return a + d * t
+end
+
+local function newRig(name)
+	local rig = MB.Pet(name)
+	rig.model.PrimaryPart.Anchored = true
+	rig.pos = nil
+	rig.yaw = 0
+	rig.lunge = -10
+	rig.lastStep = 0
+	rig.flapT = 0
+	rig.name = name
+	rig.drop = rig.model:GetAttribute("Drop") or 2
+	return rig
+end
+
+local function destroyState(st)
+	for _, p in ipairs(st.pets) do p.model:Destroy() end
+	if st.mount then st.mount.model:Destroy() end
+	st.pets = {}
+	st.mount = nil
+end
+
+local function stomp(rig, pos)
+	local d = (camera.CFrame.Position - pos).Magnitude
+	local f = math.clamp(1 - d / 260, 0, 1)
+	if f <= 0 then return end
+	S.shakeAmp = math.max(S.shakeAmp, f * math.clamp(rig.scale / 11, 0.1, 1) * 0.9)
+	S.sfx("Stomp", 0.55 * f, 0.55 + math.random() * 0.15, pos)
+	S.burst(pos + Vector3.new(math.random(-3, 3) * rig.scale * 0.2, 0.5, math.random(-3, 3) * rig.scale * 0.2), Color3.fromRGB(190, 170, 140), 12, rig.scale * 0.25, rig.scale * 1.2, 1)
+end
+
+-- moves one rig toward a target with smoothing, animates it
+local function drive(rig, target, faceYaw, dt, rate, attack, flying)
+	local root = rig.model.PrimaryPart
+	if not rig.pos then rig.pos = target rig.last = target end
+	rig.pos = rig.pos:Lerp(target, 1 - math.exp(-dt * rate))
+	local delta = rig.pos - rig.last
+	local speed = Vector3.new(delta.X, 0, delta.Z).Magnitude / math.max(dt, 1e-3)
+	rig.last = rig.pos
+	if speed > 2.5 and not rig.fixedYaw then
+		rig.yaw = angleLerp(rig.yaw, math.atan2(-delta.X, -delta.Z), 1 - math.exp(-dt * 6))
+	else
+		rig.yaw = angleLerp(rig.yaw, faceYaw, 1 - math.exp(-dt * 5))
+	end
+	root.CFrame = CFrame.new(rig.pos) * CFrame.Angles(0, rig.yaw, 0)
+	MB.Animate(rig, dt, speed, flying or false, attack)
+	if rig.titanic and rig.kind ~= "dragon" and speed > 3 then
+		local st = math.floor(rig.phase / math.pi)
+		if st ~= rig.lastStep then
+			rig.lastStep = st
+			stomp(rig, rig.pos - Vector3.new(0, rig.drop, 0))
+		end
+	end
+	if rig.titanic and rig.kind == "dragon" then
+		rig.flapT = rig.flapT + dt
+		if rig.flapT > 1.3 then
+			rig.flapT = 0
+			if (camera.CFrame.Position - rig.pos).Magnitude < 300 then S.sfx("Flap", 0.5, 0.5, rig.pos) end
+		end
+	end
+	return speed
+end
+
+local function process(plr, dt)
+	local st = state[plr]
+	if not st then
+		st = {key = "", pets = {}}
+		state[plr] = st
+	end
+	local char = plr.Character
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	local eq = plr:GetAttribute("Equipped") or ""
+	local riding = plr:GetAttribute("Riding")
+	local hide = (UI.hideOthers and plr ~= S.player) or not hrp or not hum or hum.Health <= 0
+	local key = (hide and "hidden") or (eq .. "|" .. (riding or ""))
+	if key ~= st.key then
+		destroyState(st)
+		st.key = key
+		if not hide then
+			for name in string.gmatch(eq, "[^,]+") do
+				if Config.Pets[name] then
+					local rig = newRig(name)
+					rig.model.Parent = folder
+					table.insert(st.pets, rig)
+				end
+			end
+			if riding and Config.Pets[riding] then
+				local rig = newRig(riding)
+				rig.fixedYaw = true
+				rig.model.Parent = folder
+				st.mount = rig
+			end
+		end
+	end
+	if hide then return end
+
+	local gy = S.groundY(char)
+	local look = hrp.CFrame.LookVector
+	local ownerYaw = math.atan2(-look.X, -look.Z)
+	local base = hrp.Position
+	local tv = plr:FindFirstChild("Target")
+	local enemy = tv and tv.Value
+	local fighting = enemy and enemy.Parent and not enemy:GetAttribute("Dead")
+	local center, eradius
+	if fighting then
+		center = enemy:GetPivot().Position
+		eradius = enemy:GetAttribute("Radius") or 5
+	end
+	-- mount
+	if st.mount then
+		local m = st.mount
+		if m.kind == "dragon" then
+			local saddle = m.model:GetAttribute("Saddle") or 4
+			local cf = hrp.CFrame * CFrame.new(0, -3 - saddle, 0)
+			m.pos = cf.Position
+			m.model.PrimaryPart.CFrame = cf
+			MB.Animate(m, dt, hrp.AssemblyLinearVelocity.Magnitude, true, 0)
+			m.flapT = m.flapT + dt
+			if m.flapT > 0.9 then m.flapT = 0 if plr == S.player then S.sfx("Flap", 0.45, 0.5) end end
+		else
+			local vel = hrp.AssemblyLinearVelocity
+			local pos = Vector3.new(base.X, gy + m.drop, base.Z)
+			m.pos, m.last = pos, m.last or pos
+			local speed = Vector3.new(vel.X, 0, vel.Z).Magnitude
+			m.yaw = angleLerp(m.yaw, ownerYaw, 1 - math.exp(-dt * 8))
+			m.model.PrimaryPart.CFrame = CFrame.new(pos) * CFrame.Angles(0, m.yaw, 0)
+			MB.Animate(m, dt, speed, false, 0)
+			if speed > 3 then
+				local stp = math.floor(m.phase / math.pi)
+				if stp ~= m.lastStep then m.lastStep = stp stomp(m, pos - Vector3.new(0, m.drop, 0)) end
+			end
+		end
+	end
+	-- followers
+	local normal, n = {}, 0
+	for i, rig in ipairs(st.pets) do
+		if riding and rig.name == riding then
+			rig.model.Parent = nil
+		else
+			if rig.model.Parent ~= folder then rig.model.Parent = folder end
+			if not rig.titanic then n = n + 1 normal[rig] = n end
+		end
+	end
+	for i, rig in ipairs(st.pets) do
+		if rig.model.Parent == folder then
+			local attack = 0
+			local tgt
+			local face = ownerYaw
+			local hover = 0
+			if rig.kind == "dragon" then hover = rig.scale < 3 and (1.2 + rig.scale * 0.9 + math.sin(os.clock() * 2 + i) * 0.35) or (rig.scale * 0.22 + 3) end
+			if fighting then
+				local ang = (i / math.max(#st.pets, 1)) * math.pi * 2 + 0.6
+				local dist = eradius + rig.scale * (rig.titanic and 3.2 or 2.2) + 3
+				local p2 = Vector3.new(center.X + math.cos(ang) * dist, center.Y + rig.drop + hover, center.Z + math.sin(ang) * dist)
+				local toE = Vector3.new(center.X - p2.X, 0, center.Z - p2.Z)
+				face = math.atan2(-toE.X, -toE.Z)
+				local t = os.clock() - rig.lunge
+				if t < 0.32 then
+					attack = math.sin(math.pi * t / 0.32)
+					p2 = p2 + toE.Unit * (toE.Magnitude - eradius - rig.scale) * 0.55 * attack
+				end
+				tgt = p2
+			else
+				local slot, r
+				if rig.titanic then
+					slot = Vector3.new(0, 0, 10 + rig.scale * 3.4)
+				else
+					local k = normal[rig] or 1
+					local ang = (k - (n + 1) / 2) * 0.75
+					r = 6.5 + rig.scale * 2.4
+					slot = Vector3.new(math.sin(ang) * r, 0, math.cos(ang) * r * 0.9 + 1.5)
+				end
+				local cf = CFrame.new(base) * CFrame.Angles(0, ownerYaw, 0)
+				local w = cf:PointToWorldSpace(slot)
+				tgt = Vector3.new(w.X, gy + rig.drop + hover, w.Z)
+			end
+			drive(rig, tgt, face, dt, rig.titanic and 3.2 or 7.5, attack, false)
+		end
+	end
+end
+
+RunService.RenderStepped:Connect(function(dt)
+	dt = math.min(dt, 0.1)
+	for _, plr in ipairs(Players:GetPlayers()) do
+		local ok, err = pcall(process, plr, dt)
+		if not ok then warn("[pets]", err) end
+	end
+end)
+
+Players.PlayerRemoving:Connect(function(plr)
+	local st = state[plr]
+	if st then destroyState(st) state[plr] = nil end
+end)
+
+S.R.PetHit.OnClientEvent:Connect(function(plr, idx, enemy, dmg)
+	local st = state[plr]
+	if not st or not enemy or not enemy.Parent then return end
+	local rig = st.pets[idx]
+	if rig then rig.lunge = os.clock() end
+	local pos = enemy:GetPivot().Position + Vector3.new(0, (enemy:GetAttribute("Height") or 6) * 0.5, 0)
+	if plr == S.player or math.random() < 0.3 then
+		S.burst(pos, rig and Color3.fromRGB(255, 240, 180) or Color3.new(1, 1, 1), 6, 1.2, 14, 0.4)
+		if plr == S.player then S.sfx("Hit", 0.3, 0.9 + math.random() * 0.3, pos) end
+	end
+	S.emit("EnemyHit", enemy)
+end)
+
+function Pets.mountRig(plr) return state[plr] and state[plr].mount end
+
+return Pets
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX4"><Properties><string name="Name">WorldClient</string><ProtectedString name="Source"><![CDATA[-- WorldClient (ModuleScript) | StarterPlayerScripts.Client.WorldClient
+local S = require(script.Parent.Shared)
+local UI = require(script.Parent.UI)
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local TS = S.TS
+local Config = S.Config
+local W = {}
+local Terrain = workspace.Terrain
+local camera = workspace.CurrentCamera
+local enemiesFolder = workspace:WaitForChild("Enemies")
+
+---------------------------------------------------------------- enemy selection
+local rayParams = RaycastParams.new()
+rayParams.FilterType = Enum.RaycastFilterType.Include
+rayParams.FilterDescendantsInstances = {enemiesFolder}
+
+local highlight = Instance.new("Highlight")
+highlight.FillTransparency = 0.85
+highlight.FillColor = Color3.fromRGB(255, 80, 80)
+highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+
+local function enemyAt(ray)
+	local r
+	local ok, res = pcall(function() return workspace:Spherecast(ray.Origin, 2.5, ray.Direction * 600, rayParams) end)
+	if ok then r = res else r = workspace:Raycast(ray.Origin, ray.Direction * 600, rayParams) end
+	if r and r.Instance then
+		local m = r.Instance:FindFirstAncestorWhichIsA("Model")
+		if m and m.Parent == enemiesFolder and not m:GetAttribute("Dead") then return m end
+	end
+end
+
+local function target()
+	local tv = S.player:FindFirstChild("Target")
+	return tv and tv.Value
+end
+
+UIS.InputBegan:Connect(function(input, gp)
+	if gp then return end
+	local ray
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		local p = UIS:GetMouseLocation()
+		ray = camera:ViewportPointToRay(p.X, p.Y)
+	elseif input.UserInputType == Enum.UserInputType.Touch then
+		ray = camera:ScreenPointToRay(input.Position.X, input.Position.Y)
+	else
+		return
+	end
+	if S.data and not S.data.starter then return end
+	local m = enemyAt(ray)
+	if m and m ~= target() then
+		S.R.Select:FireServer(m)
+		S.sfx("Click", 0.5, 1.2)
+		highlight.Adornee = m
+		highlight.Parent = m
+	end
+end)
+
+task.spawn(function()
+	local tv = S.player:WaitForChild("Target")
+	tv.Changed:Connect(function(v)
+		if v and v.Parent then
+			highlight.Adornee = v
+			highlight.Parent = v
+		else
+			highlight.Adornee = nil
+			highlight.Parent = nil
+		end
+	end)
+end)
+
+---------------------------------------------------------------- idle bob + hit shake
+local base = {}
+local hitAt = {}
+S.on("EnemyHit", function(m) hitAt[m] = os.clock() end)
+RunService.RenderStepped:Connect(function()
+	local t = os.clock()
+	local cp = camera.CFrame.Position
+	for _, m in ipairs(enemiesFolder:GetChildren()) do
+		if m:IsA("Model") and not m:GetAttribute("Dead") then
+			local b = base[m]
+			if not b then b = m:GetPivot() base[m] = b end
+			if (b.Position - cp).Magnitude < 170 then
+				local seed = (b.Position.X + b.Position.Z) * 0.1
+				local off = CFrame.new(0, math.sin(t * 1.6 + seed) * 0.35, 0) * CFrame.Angles(0, math.sin(t * 0.7 + seed) * 0.08, 0)
+				local h = t - (hitAt[m] or -10)
+				if h < 0.18 then off = off * CFrame.new(math.random(-10, 10) / 40, 0, math.random(-10, 10) / 40) end
+				m:PivotTo(b * off)
+			end
+		end
+	end
+end)
+
+---------------------------------------------------------------- damage numbers
+S.R.Damage.OnClientEvent:Connect(function(enemy, dmg)
+	if not enemy or not enemy.Parent then return end
+	local pos = enemy:GetPivot().Position + Vector3.new(math.random(-20, 20) / 10, (enemy:GetAttribute("Height") or 6) * 0.6, math.random(-20, 20) / 10)
+	local att = Instance.new("Attachment")
+	att.WorldPosition = pos
+	att.Parent = Terrain
+	local g = Instance.new("BillboardGui")
+	g.Size = UDim2.fromOffset(120, 40)
+	g.AlwaysOnTop = true
+	g.Adornee = att
+	g.Parent = att
+	local l = S.label(g, S.fmt(dmg), 26, Color3.fromRGB(255, 240, 120), {Size = UDim2.fromScale(1, 1), TextStrokeTransparency = 0, TextStrokeColor3 = Color3.fromRGB(180, 70, 0)})
+	g.StudsOffset = Vector3.new(0, 0, 0)
+	TS:Create(g, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {StudsOffset = Vector3.new(0, 6, 0)}):Play()
+	TS:Create(l, TweenInfo.new(0.8), {TextTransparency = 1, TextStrokeTransparency = 1}):Play()
+	game:GetService("Debris"):AddItem(att, 1)
+end)
+
+---------------------------------------------------------------- defeat animation
+S.R.Defeated.OnClientEvent:Connect(function(m)
+	if not m or not m.Parent then return end
+	local center = m:GetPivot().Position
+	S.sfx("Defeat", 0.6, 0.9, center)
+	S.burst(center + Vector3.new(0, 4, 0), Color3.fromRGB(255, 230, 150), 30, 2, 40, 0.8)
+	for _, p in ipairs(m:GetDescendants()) do
+		if p:IsA("BasePart") then
+			local dir = (p.Position - center)
+			dir = (dir.Magnitude > 0.1 and dir.Unit or Vector3.new(0, 1, 0)) * 10 + Vector3.new(0, 6, 0)
+			local goal = {Transparency = 1, CFrame = p.CFrame * CFrame.Angles(math.random() * 3, math.random() * 3, math.random() * 3) + dir, Size = p.Size * 0.2}
+			p.CanCollide = false
+			TS:Create(p, TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal):Play()
+		end
+	end
+	if target() == m then highlight.Parent = nil end
+end)
+
+---------------------------------------------------------------- coins flying to the player
+local coins = {}
+S.R.Coin.OnClientEvent:Connect(function(pos, amount)
+	local n = math.clamp(4 + math.floor(math.log10(math.max(amount, 1)) * 2), 4, 16)
+	for i = 1, n do
+		local p = Instance.new("Part")
+		p.Anchored = true p.CanCollide = false p.CanQuery = false p.CanTouch = false
+		p.Shape = Enum.PartType.Cylinder
+		p.Size = Vector3.new(0.4, 2, 2)
+		p.Material = Enum.Material.Neon
+		p.Color = Color3.fromRGB(255, 205, 40)
+		p.CFrame = CFrame.new(pos) * CFrame.Angles(0, 0, math.pi / 2)
+		p.Parent = workspace
+		coins[#coins + 1] = {part = p, t0 = os.clock() + i * 0.03, from = pos, burst = Vector3.new(math.random(-10, 10), math.random(6, 14), math.random(-10, 10)), dead = false}
+	end
+	-- floating +amount
+	local att = Instance.new("Attachment")
+	att.WorldPosition = pos + Vector3.new(0, 4, 0)
+	att.Parent = Terrain
+	local g = Instance.new("BillboardGui")
+	g.Size = UDim2.fromOffset(200, 50) g.AlwaysOnTop = true g.Adornee = att g.Parent = att
+	local l = S.label(g, "+" .. S.fmt(amount) .. " 🪙", 32, Color3.fromRGB(255, 220, 60), {Size = UDim2.fromScale(1, 1), TextStrokeTransparency = 0})
+	TS:Create(g, TweenInfo.new(1.4), {StudsOffset = Vector3.new(0, 9, 0)}):Play()
+	TS:Create(l, TweenInfo.new(1.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1, TextStrokeTransparency = 1}):Play()
+	game:GetService("Debris"):AddItem(att, 1.6)
+	S.sfx("Coin", 0.5, 1 + math.random() * 0.3)
+end)
+
+RunService.RenderStepped:Connect(function()
+	if #coins == 0 then return end
+	local char = S.player.Character
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	local now = os.clock()
+	for i = #coins, 1, -1 do
+		local c = coins[i]
+		local t = now - c.t0
+		if t >= 0 then
+			if t < 0.35 then
+				c.part.Position = c.from + c.burst * t + Vector3.new(0, -20 * t * t, 0)
+			elseif hrp then
+				local a = math.clamp((t - 0.35) / 0.45, 0, 1)
+				local start = c.from + c.burst * 0.35 + Vector3.new(0, -20 * 0.1225, 0)
+				c.part.Position = start:Lerp(hrp.Position + Vector3.new(0, 2, 0), a * a)
+				if a >= 1 then c.part:Destroy() table.remove(coins, i) end
+			else
+				c.part:Destroy() table.remove(coins, i)
+			end
+		end
+	end
+end)
+
+---------------------------------------------------------------- spawn eggs: locked / unlocked visuals
+local stands = {}
+local function findStands()
+	local eggs = workspace:WaitForChild("World"):WaitForChild("Spawn"):WaitForChild("Eggs")
+	for _, m in ipairs(eggs:GetChildren()) do
+		local id = m:GetAttribute("EggId")
+		if id then stands[id] = m end
+	end
+end
+local function refreshWorld()
+	local d = S.data
+	if not d then return end
+	for id, m in pairs(stands) do
+		local e = Config.Eggs[id]
+		local unlocked = d.areas[tostring(e.area)] == true
+		for _, p in ipairs(m:GetDescendants()) do
+			if p:IsA("BasePart") and p.Name ~= "Sign" and p.Name ~= "Base" and p.Name ~= "Ring" then
+				p.LocalTransparencyModifier = unlocked and 0 or 1
+			end
+		end
+		local sg = m.Sign:FindFirstChild("SignGui")
+		if sg then
+			sg.Title.Text = unlocked and e.display or ("🔒 " .. Config.Areas[e.area].name)
+			sg.Price.Text = unlocked and ("🪙 " .. S.fmt(e.price)) or "Unlock this area first"
+		end
+	end
+	for i = 1, 10 do
+		local area = workspace.World:FindFirstChild("Area" .. i)
+		local barrier = area and area:FindFirstChild("Barrier")
+		if barrier and d.areas[tostring(i)] then
+			barrier.CanCollide = false
+			barrier.Transparency = 1
+			local pr = barrier:FindFirstChildOfClass("ProximityPrompt")
+			if pr then pr.Enabled = false end
+		end
+	end
+end
+task.spawn(function()
+	findStands()
+	refreshWorld()
+end)
+S.on("Data", refreshWorld)
+
+S.R.Fx.OnClientEvent:Connect(function(kind, i)
+	if kind == "AreaUnlock" then
+		UI.flash(Config.Areas[i].theme.glow, 1.2)
+		S.sfx("Unlock", 0.8)
+		UI.banner("🌍 AREA UNLOCKED!", Config.Areas[i].name .. " — new egg at spawn!", Config.Areas[i].theme.glow:Lerp(Color3.new(0, 0, 0), 0.5), Color3.fromRGB(30, 30, 60), 4)
+	end
+end)
+
+---------------------------------------------------------------- area detection, lighting, nearest egg
+local currentArea = -1
+local nearEgg
+local function lightTo(p)
+	TS:Create(Lighting, TweenInfo.new(2), {Ambient = p.ambient, OutdoorAmbient = p.ambient, FogColor = p.fog, FogEnd = p.fogEnd, ClockTime = p.clock, Brightness = p.bright}):Play()
+end
+local spawnLight = {ambient = Color3.fromRGB(130, 135, 150), fog = Color3.fromRGB(200, 225, 255), fogEnd = 1500, clock = 14, bright = 2.6}
+Lighting.FogStart = 0
+lightTo(spawnLight)
+
+task.spawn(function()
+	while true do
+		task.wait(0.25)
+		local char = S.player.Character
+		local hrp = char and char:FindFirstChild("HumanoidRootPart")
+		if hrp then
+			local p = hrp.Position
+			local a = 0
+			for i = 1, 10 do
+				local c = Config.AreaCenter(i)
+				if (Vector3.new(p.X, 0, p.Z) - c).Magnitude < Config.World.AreaRadius + 10 then a = i break end
+			end
+			if a ~= currentArea then
+				currentArea = a
+				UI.setArea(a)
+				lightTo(a == 0 and spawnLight or Config.Areas[a].light)
+			end
+			local best, bd
+			for id, m in pairs(stands) do
+				local d = (m.PrimaryPart.Position - p).Magnitude
+				local e = Config.Eggs[id]
+				if d < 22 and S.data and S.data.areas[tostring(e.area)] and (not bd or d < bd) then best, bd = id, d end
+			end
+			if best ~= nearEgg then
+				nearEgg = best
+				S.emit("NearEgg", best)
+			end
+		end
+	end
+end)
+
+function W.nearEgg() return nearEgg end
+
+return W
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX5"><Properties><string name="Name">Hatch</string><ProtectedString name="Source"><![CDATA[-- Hatch (ModuleScript) | StarterPlayerScripts.Client.Hatch
+local S = require(script.Parent.Shared)
+local UI = require(script.Parent.UI)
+local Config, pal, mk, round, stroke, label, button = S.Config, S.pal, S.mk, S.round, S.stroke, S.label, S.button
+local TS = S.TS
+local H = {}
+
+local nearEgg
+local busy, auto, lastCount = false, false, 1
+local snapshot = {}
+
+S.on("Data", function(d)
+	if not busy then
+		snapshot = {}
+		for k in pairs(d.discovered) do snapshot[k] = true end
+	end
+end)
+
+---------------------------------------------------------------- egg panel
+local panel = mk("Frame", {Parent = UI.root, AnchorPoint = Vector2.new(0.5, 1), Position = UDim2.new(0.5, 0, 1, -84), Size = UDim2.fromOffset(500, 210), BackgroundColor3 = pal.panel, Visible = false, ZIndex = 8})
+round(panel, 16) stroke(panel, Color3.fromRGB(15, 15, 30), 4)
+local title = label(panel, "", 24, pal.acc, {Position = UDim2.fromOffset(12, 4), Size = UDim2.new(1, -24, 0, 30), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 9})
+local odds = mk("ScrollingFrame", {Parent = panel, Position = UDim2.fromOffset(12, 40), Size = UDim2.fromOffset(270, 160), BackgroundColor3 = pal.bg, BackgroundTransparency = 0.3, ScrollBarThickness = 5, CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y, BorderSizePixel = 0, ZIndex = 9})
+round(odds, 10)
+mk("UIListLayout", {Parent = odds, Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder})
+local hBtns = {}
+local function setPanel(eggId)
+	nearEgg = eggId
+	if not eggId then panel.Visible = false auto = false return end
+	local e = Config.Eggs[eggId]
+	panel.Visible = true
+	title.Text = e.display .. "  —  🪙 " .. S.fmt(e.price)
+	for _, c in ipairs(odds:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end end
+	for i, o in ipairs(e.odds) do
+		local pet = Config.Pets[o[1]]
+		local row = mk("Frame", {Parent = odds, Size = UDim2.new(1, -8, 0, 26), BackgroundColor3 = pet.titanic and Color3.fromRGB(110, 20, 30) or pal.panel, LayoutOrder = i, ZIndex = 10})
+		round(row, 6)
+		label(row, (pet.titanic and "★ " or "") .. pet.display, 15, S.rarityColor(o[1]), {Size = UDim2.new(0.62, 0, 1, 0), Position = UDim2.fromOffset(6, 0), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 11, TextStrokeTransparency = 0.6})
+		label(row, Config.OddsText(o[2]), 14, Color3.new(1, 1, 1), {Size = UDim2.new(0.38, -6, 1, 0), Position = UDim2.new(0.62, 0, 0, 0), TextXAlignment = Enum.TextXAlignment.Right, ZIndex = 11})
+	end
+	for c, b in pairs(hBtns) do b.Text = "Hatch x" .. c .. "\n🪙 " .. S.fmt(e.price * c) end
+end
+S.on("NearEgg", setPanel)
+
+---------------------------------------------------------------- overlay animation
+local function eggViewport(parent, eggId)
+	local theme = Config.Areas[Config.Eggs[eggId].area].theme
+	local vp = mk("ViewportFrame", {Parent = parent, Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Ambient = Color3.fromRGB(170, 170, 185), LightColor = Color3.new(1, 1, 1), LightDirection = Vector3.new(-0.6, -0.8, -0.5)})
+	local m = Instance.new("Model") m.Parent = vp
+	local function ball(size, pos, color, mat)
+		local p = Instance.new("Part") p.Size = size p.Position = pos p.Color = color p.Material = mat or Enum.Material.SmoothPlastic p.Anchored = true p.CanCollide = false
+		local mesh = Instance.new("SpecialMesh") mesh.MeshType = Enum.MeshType.Sphere mesh.Parent = p
+		p.Parent = m
+		return p
+	end
+	ball(Vector3.new(4, 5.2, 4), Vector3.zero, theme.c2)
+	for i = 1, 7 do
+		local a = i * 2.4
+		local y = ((i % 4) - 1.5) * 1.1
+		local r = 2 * math.sqrt(math.max(0.05, 1 - (y / 2.6) ^ 2))
+		ball(Vector3.new(0.8, 0.8, 0.8), Vector3.new(math.cos(a) * r * 0.97, y, math.sin(a) * r * 0.97 - 0.2), theme.c1)
+	end
+	local cam = Instance.new("Camera")
+	cam.FieldOfView = 40
+	cam.CFrame = CFrame.lookAt(Vector3.new(0, 0.3, -11), Vector3.zero)
+	cam.Parent = vp
+	vp.CurrentCamera = cam
+	return vp, m
+end
+
+local function playHatch(eggId, results, fast)
+	local ov = mk("TextButton", {Parent = UI.root, Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 0.35, Text = "", ZIndex = 60, AutoButtonColor = false})
+	local skip = false
+	ov.MouseButton1Click:Connect(function() skip = true end)
+	local n = #results
+	local cols = n == 1 and 1 or (n == 3 and 3 or 4)
+	local size = n == 1 and 280 or (n == 3 and 210 or 150)
+	local rows = math.ceil(n / cols)
+	local wait = function(t) if fast or skip then t = t * 0.35 end task.wait(t) end
+	local done = 0
+	local hasTitanic = false
+	for _, r in ipairs(results) do if Config.Pets[r].titanic then hasTitanic = true end end
+	for i, name in ipairs(results) do
+		local cx = (i - 1) % cols
+		local cy = math.floor((i - 1) / cols)
+		local cell = mk("Frame", {Parent = ov, AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(size, size + 34), Position = UDim2.new(0.5, (cx - (cols - 1) / 2) * (size + 10), 0.5, (cy - (rows - 1) / 2) * (size + 44)), BackgroundTransparency = 1, ZIndex = 61})
+		local box = mk("Frame", {Parent = cell, Size = UDim2.fromOffset(size, size), BackgroundTransparency = 1, ZIndex = 61})
+		local evp = eggViewport(box, eggId)
+		evp.ZIndex = 62
+		local pet = Config.Pets[name]
+		task.spawn(function()
+			-- wobble
+			local cam = evp.CurrentCamera
+			local t0 = os.clock()
+			local dur = fast and 0.7 or 1.5
+			local cracked = false
+			while os.clock() - t0 < dur and not skip do
+				local a = (os.clock() - t0) / dur
+				local w = math.sin((os.clock() - t0) * (10 + a * 18)) * (0.08 + a * 0.35)
+				cam.CFrame = CFrame.lookAt(Vector3.new(0, 0.3, -11), Vector3.zero) * CFrame.Angles(0, 0, w)
+				if not cracked and a > 0.5 then cracked = true S.sfx("Crack", 0.5, 1) end
+				if a > 0.8 and math.random() < 0.15 then S.sfx("Crack", 0.3, 1.2 + a) end
+				task.wait()
+			end
+			if pet.titanic then
+				UI.flash(Color3.fromRGB(255, 60, 40), 2)
+				S.shakeAmp = math.max(S.shakeAmp, 1.5)
+				S.sfx("Titanic", 1, 0.7)
+				wait(0.6)
+			end
+			-- burst
+			evp:Destroy()
+			local fl = mk("Frame", {Parent = box, Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(1, 1, 1), ZIndex = 70})
+			round(fl, 20)
+			TS:Create(fl, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+			S.sfx("Hatch", 0.7, 1)
+			local vp, rig, pcam = S.petIcon(box, name)
+			vp.ZIndex = 63
+			local origin = pcam.CFrame
+			local far = pet.titanic and 5 or 3
+			local t1 = os.clock()
+			while os.clock() - t1 < 0.55 do
+				local a = (os.clock() - t1) / 0.55
+				local e = 1 - (1 - a) ^ 3
+				local over = 1 + math.sin(a * math.pi) * 0.12
+				pcam.CFrame = origin * CFrame.new(0, 0, (1 - e) * far * (origin.Position.Magnitude) * 0.3) * CFrame.new(0, 0, -origin.Position.Magnitude * (over - 1))
+				task.wait()
+			end
+			pcam.CFrame = origin
+			local rc = S.rarityColor(name)
+			local isNew = not snapshot[name]
+			local nameL = label(cell, (isNew and "NEW! " or "") .. pet.display, n == 1 and 30 or 17, rc, {Position = UDim2.fromOffset(0, size), Size = UDim2.new(1, 0, 0, 34), ZIndex = 65, TextStrokeTransparency = 0})
+			nameL.TextScaled = n > 1
+			stroke(box, rc, 4)
+			round(box, 20)
+			local order = Config.Rarities[pet.rarity].order
+			if order >= 4 then
+				S.sfx("Rare", 0.4 + order * 0.05, 1)
+				for k = 1, 8 do
+					local st = label(box, order >= 6 and "✨" or "⭐", 22, nil, {Size = UDim2.fromOffset(30, 30), AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), ZIndex = 68})
+					local ang = k / 8 * math.pi * 2
+					TS:Create(st, TweenInfo.new(0.9), {Position = UDim2.fromScale(0.5 + math.cos(ang) * 0.6, 0.5 + math.sin(ang) * 0.6), TextTransparency = 1}):Play()
+				end
+				if order >= 6 then UI.flash(rc, 0.7) end
+			end
+			if pet.titanic then
+				local big = label(ov, "★ TITANIC ★", 60, Color3.fromRGB(255, 220, 80), {AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.14), Size = UDim2.fromOffset(500, 70), ZIndex = 80, TextStrokeTransparency = 0})
+				TS:Create(big, TweenInfo.new(0.6, Enum.EasingStyle.Back), {Size = UDim2.fromOffset(560, 80)}):Play()
+				S.sfx("Rare", 1, 0.7)
+			end
+			done = done + 1
+		end)
+	end
+	local t = os.clock()
+	while done < n and os.clock() - t < 12 do task.wait(0.1) end
+	local hold = hasTitanic and 3.2 or (fast and 0.5 or 1.4)
+	local h0 = os.clock()
+	while os.clock() - h0 < hold and not skip do task.wait(0.05) end
+	ov:Destroy()
+end
+
+---------------------------------------------------------------- buttons
+local function doHatch(count)
+	if busy or not nearEgg then return false end
+	busy = true
+	lastCount = count
+	local eggId = nearEgg
+	local res = S.invoke("Hatch", eggId, count)
+	if not res or not res.ok then
+		UI.toast(res and res.err or "Hatch failed", "error")
+		busy = false
+		return false
+	end
+	S.sfx("Buy", 0.6)
+	playHatch(eggId, res.results, auto)
+	busy = false
+	return true
+end
+
+local bx = 296
+for i, c in ipairs({1, 3, 8}) do
+	hBtns[c] = button(panel, "Hatch x" .. c, c == 1 and pal.good or (c == 3 and pal.blue or Color3.fromRGB(150, 90, 230)), UDim2.fromOffset(190, 44), UDim2.fromOffset(bx, 40 + (i - 1) * 50), function() doHatch(c) end, {TextSize = 17, ZIndex = 9})
+end
+local autoBtn
+autoBtn = button(panel, "Auto Hatch: OFF", pal.bad, UDim2.fromOffset(190, 22), UDim2.fromOffset(bx, 190), function(b)
+	auto = not auto
+	b.Text = "Auto Hatch: " .. (auto and "ON" or "OFF")
+	b.BackgroundColor3 = auto and pal.good or pal.bad
+end, {TextSize = 14, ZIndex = 9})
+panel.Size = UDim2.fromOffset(500, 222)
+
+task.spawn(function()
+	while true do
+		task.wait(0.3)
+		if not nearEgg and auto then auto = false autoBtn.Text = "Auto Hatch: OFF" autoBtn.BackgroundColor3 = pal.bad end
+		if auto and nearEgg and not busy then
+			if not doHatch(lastCount) then
+				auto = false
+				autoBtn.Text = "Auto Hatch: OFF"
+				autoBtn.BackgroundColor3 = pal.bad
+			end
+		end
+	end
+end)
+
+return H
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX6"><Properties><string name="Name">Starter</string><ProtectedString name="Source"><![CDATA[-- Starter (ModuleScript) | StarterPlayerScripts.Client.Starter
+-- First-join creature selection: a client-side 3D stage with an animated intro for each starter.
+local S = require(script.Parent.Shared)
+local UI = require(script.Parent.UI)
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local TS = S.TS
+local MB, pal, mk, round, stroke, label, button = S.MB, S.pal, S.mk, S.round, S.stroke, S.label, S.button
+local Starter = {}
+local camera = workspace.CurrentCamera
+local running = false
+
+local function ease(a) return 1 - (1 - a) ^ 3 end
+
+function Starter.run()
+	if running then return end
+	running = true
+	local Y = 5000
+	local stage = Instance.new("Folder")
+	stage.Name = "StarterStage"
+	stage.Parent = workspace
+	local saved = {Ambient = Lighting.Ambient, OutdoorAmbient = Lighting.OutdoorAmbient, ClockTime = Lighting.ClockTime, Brightness = Lighting.Brightness, FogEnd = Lighting.FogEnd}
+	Lighting.Ambient = Color3.fromRGB(120, 100, 160)
+	Lighting.OutdoorAmbient = Color3.fromRGB(120, 100, 160)
+	Lighting.ClockTime = 21
+	Lighting.FogEnd = 100000
+
+	local function part(size, cf, color, mat, shape)
+		local p = Instance.new("Part")
+		p.Anchored = true p.CanCollide = false p.CanQuery = false
+		p.Size = size p.CFrame = cf p.Color = color p.Material = mat or Enum.Material.SmoothPlastic
+		if shape == "Cyl" then p.Shape = Enum.PartType.Cylinder end
+		p.Parent = stage
+		return p
+	end
+	local function pedestal(x, color)
+		part(Vector3.new(2, 24, 24), CFrame.new(x, Y - 1, 0) * CFrame.Angles(0, 0, math.pi / 2), Color3.fromRGB(70, 70, 90), Enum.Material.Marble, "Cyl")
+		part(Vector3.new(0.5, 26, 26), CFrame.new(x, Y + 0.1, 0) * CFrame.Angles(0, 0, math.pi / 2), color, Enum.Material.Neon, "Cyl")
+		local l = Instance.new("PointLight") l.Color = color l.Range = 40 l.Brightness = 3 l.Parent = part(Vector3.new(1, 1, 1), CFrame.new(x, Y + 12, -4), color, Enum.Material.Neon)
+	end
+	pedestal(-17, Color3.fromRGB(90, 220, 90))
+	pedestal(17, Color3.fromRGB(255, 90, 60))
+	part(Vector3.new(160, 22, 22), CFrame.new(0, Y - 3, 0) * CFrame.Angles(0, 0, math.pi / 2), Color3.fromRGB(35, 30, 55), Enum.Material.Slate, "Cyl").Size = Vector3.new(2, 160, 160)
+	local back = part(Vector3.new(220, 110, 1), CFrame.new(0, Y + 40, 55), Color3.fromRGB(40, 20, 80))
+	local sg = Instance.new("SurfaceGui") sg.Face = Enum.NormalId.Front sg.Parent = back
+	local f = mk("Frame", {Parent = sg, Size = UDim2.fromScale(1, 1), BackgroundColor3 = Color3.new(1, 1, 1)})
+	mk("UIGradient", {Parent = f, Rotation = 90, Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 10, 50)), ColorSequenceKeypoint.new(0.6, Color3.fromRGB(150, 50, 120)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 160, 80))})})
+
+	local K = 3.6
+	local dino = MB.Pet("StarterDino")
+	local drag = MB.Pet("StarterDragon")
+	for _, r in ipairs({dino, drag}) do
+		r.model.PrimaryPart.Anchored = true
+		r.model.Parent = stage
+		r.model:ScaleTo(K)
+		r.d = (r.model:GetAttribute("Drop") or 2)
+	end
+	local dinoDrop = dino.model:GetAttribute("Drop") * K / (dino.model:GetAttribute("Scale") and 1 or 1)
+	dino.drop = dinoDrop / 1
+	drag.drop = drag.model:GetAttribute("Drop") * K
+
+	camera.CameraType = Enum.CameraType.Scriptable
+	local t0 = os.clock()
+	local last = t0
+	local roarAt, fireAt = nil, nil
+	local fire = Instance.new("ParticleEmitter")
+	fire.Color = ColorSequence.new(Color3.fromRGB(255, 160, 40), Color3.fromRGB(255, 60, 20))
+	fire.Lifetime = NumberRange.new(0.5, 0.9) fire.Speed = NumberRange.new(26, 36) fire.Rate = 0 fire.LightEmission = 1
+	fire.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, 1.2), NumberSequenceKeypoint.new(1, 4)})
+	fire.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)})
+	fire.SpreadAngle = Vector2.new(8, 8) fire.EmissionDirection = Enum.NormalId.Front
+	fire.Parent = drag.model.Head
+	local chosen
+	local stepCount = 0
+
+	RunService:BindToRenderStep("StarterStage", Enum.RenderPriority.Camera.Value + 1, function()
+		local now = os.clock()
+		local dt = math.min(now - last, 0.1)
+		last = now
+		local t = now - t0
+		-- DINO: stomps in from the left
+		local a = math.clamp(t / 3.2, 0, 1)
+		local dx = -90 + 73 * ease(a)
+		local dspeed = a < 1 and 30 or 0
+		dino.model.PrimaryPart.CFrame = CFrame.new(dx, Y + dino.drop, 0) * CFrame.Angles(0, math.rad(180 - 180 + 18 * (1 - ease(a))), 0)
+		MB.Animate(dino, dt, dspeed, false, 0)
+		if dspeed > 0 then
+			local st = math.floor(dino.phase / math.pi)
+			if st ~= stepCount then
+				stepCount = st
+				S.sfx("Stomp", 0.4, 0.9)
+				S.shakeAmp = math.max(S.shakeAmp, 0.35)
+				S.burst(Vector3.new(dx, Y + 0.5, 0), Color3.fromRGB(200, 180, 150), 10, 2, 10, 0.8)
+			end
+		elseif not roarAt then
+			roarAt = now
+			S.sfx("Hatch", 0.8, 0.5)
+			S.shakeAmp = 0.8
+		end
+		if roarAt then
+			local r = math.clamp((now - roarAt) / 1.2, 0, 1)
+			local pulse = math.sin(r * math.pi)
+			dino.joints.Jaw.Transform = CFrame.Angles(-0.8 * pulse, 0, 0)
+			dino.joints.Neck.Transform = CFrame.Angles(0.5 * pulse, 0, 0)
+		end
+		-- DRAGON: swoops in from the sky and breathes fire
+		local b = math.clamp((t - 0.4) / 3.4, 0, 1)
+		local e = ease(b)
+		local pos = Vector3.new(17 + 60 * (1 - e), Y + drag.drop + 9 + 50 * (1 - e) + math.sin(now * 2) * 0.8 * e, 60 * (1 - e))
+		local face = Vector3.new(17 - pos.X, -(pos.Y - (Y + drag.drop + 9)) * 0.7, -pos.Z).Magnitude > 0.5 and CFrame.lookAt(pos, Vector3.new(17, Y + drag.drop + 9 + 2, -40)) or CFrame.new(pos)
+		drag.model.PrimaryPart.CFrame = (b < 1) and face or (CFrame.new(pos) * CFrame.Angles(0, 0, 0))
+		MB.Animate(drag, dt, 0, true, 0)
+		if b >= 1 and not fireAt then
+			fireAt = now
+			S.sfx("Titanic", 0.5, 1.2)
+			S.shakeAmp = 0.5
+		end
+		if fireAt then
+			local r = now - fireAt
+			fire.Rate = (r < 1.4) and 220 or 0
+			drag.joints.Jaw.Transform = CFrame.Angles((r < 1.4) and -0.7 or 0, 0, 0)
+		end
+		camera.CFrame = CFrame.lookAt(Vector3.new(0, Y + 14, -46), Vector3.new(0, Y + 11, 0))
+		camera.FieldOfView = 55
+	end)
+
+	-- UI
+	local overlay = mk("Frame", {Parent = UI.root, Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 40})
+	local title = label(overlay, "CHOOSE YOUR COMPANION", 42, Color3.fromRGB(255, 230, 100), {AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 10), Size = UDim2.fromOffset(700, 52), ZIndex = 41, TextStrokeTransparency = 0})
+	label(overlay, "Both creatures have exactly the same power. This choice is permanent.", 18, Color3.new(1, 1, 1), {AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 62), Size = UDim2.fromOffset(700, 26), ZIndex = 41, TextStrokeTransparency = 0.3})
+	local sel
+	local confirm
+	local function pick(kind)
+		sel = kind
+		confirm.Visible = true
+		confirm.Text = "Confirm " .. (kind == "Dino" and "🦖 Dinosaur" or "🐉 Dragon")
+		confirm.BackgroundColor3 = kind == "Dino" and Color3.fromRGB(60, 190, 80) or Color3.fromRGB(230, 80, 50)
+	end
+	local b1 = button(overlay, "🦖 Dinosaur\n⚔ 5 damage", Color3.fromRGB(50, 150, 70), UDim2.fromOffset(230, 70), UDim2.new(0.5, -300, 1, -170), function() pick("Dino") end, {ZIndex = 41, TextSize = 24})
+	local b2 = button(overlay, "🐉 Dragon\n⚔ 5 damage", Color3.fromRGB(200, 70, 45), UDim2.fromOffset(230, 70), UDim2.new(0.5, 70, 1, -170), function() pick("Dragon") end, {ZIndex = 41, TextSize = 24})
+	confirm = button(overlay, "Confirm", pal.good, UDim2.fromOffset(280, 54), UDim2.new(0.5, -140, 1, -90), function(btn)
+		if not sel or chosen then return end
+		chosen = true
+		local ok = S.invoke("ChooseStarter", sel)
+		if not ok then chosen = false return end
+		btn.Visible = false b1.Visible = false b2.Visible = false
+		title.Text = sel == "Dino" and "A mighty Dinosaur joins you!" or "A fierce Dragon joins you!"
+		UI.flash(Color3.new(1, 1, 1), 1.2)
+		S.sfx("Rare", 0.8)
+		task.wait(2)
+		RunService:UnbindFromRenderStep("StarterStage")
+		overlay:Destroy()
+		stage:Destroy()
+		Lighting.Ambient = saved.Ambient Lighting.OutdoorAmbient = saved.OutdoorAmbient
+		Lighting.ClockTime = saved.ClockTime Lighting.Brightness = saved.Brightness Lighting.FogEnd = saved.FogEnd
+		camera.CameraType = Enum.CameraType.Custom
+		camera.FieldOfView = 70
+		running = false
+	end, {ZIndex = 41, TextSize = 22, Visible = false})
+end
+
+return Starter
+]]></ProtectedString></Properties></Item><Item class="ModuleScript" referent="RBX7"><Properties><string name="Name">Ride</string><ProtectedString name="Source"><![CDATA[-- Ride (ModuleScript) | StarterPlayerScripts.Client.Ride
+-- Titanic mounting: dragons fly (smooth physics flight), dinosaurs stomp (character lifted onto the back).
+local S = require(script.Parent.Shared)
+local UI = require(script.Parent.UI)
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local Config, MB = S.Config, S.MB
+local Ride = {}
+local camera = workspace.CurrentCamera
+local player = S.player
+
+local active
+local upHeld, downHeld = false, false
+
+UI.rideUp.MouseButton1Down:Connect(function() upHeld = true end)
+UI.rideUp.MouseButton1Up:Connect(function() upHeld = false end)
+UI.rideUp.MouseLeave:Connect(function() upHeld = false end)
+UI.rideDown.MouseButton1Down:Connect(function() downHeld = true end)
+UI.rideDown.MouseButton1Up:Connect(function() downHeld = false end)
+UI.rideDown.MouseLeave:Connect(function() downHeld = false end)
+
+local function getControls()
+	local ok, c = pcall(function()
+		return require(player:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule", 3)):GetControls()
+	end)
+	return ok and c or nil
+end
+local controls
+
+local function stop()
+	if not active then return end
+	local a = active
+	active = nil
+	RunService:UnbindFromRenderStep("BBRide")
+	if a.lv then a.lv:Destroy() end
+	if a.ao then a.ao:Destroy() end
+	if a.att then a.att:Destroy() end
+	local hum = a.hum
+	if hum and hum.Parent then
+		hum.PlatformStand = false
+		hum.HipHeight = a.hip
+		hum.WalkSpeed = 22
+		hum.JumpHeight = 7.2
+		hum.JumpPower = 50
+		hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+	end
+	player.CameraMinZoomDistance = 0.5
+	player.CameraMaxZoomDistance = 128
+	UI.showRide(false)
+	upHeld, downHeld = false, false
+end
+
+local function start(name)
+	local char = player.Character
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	local pet = Config.Pets[name]
+	if not hum or not hrp or not pet then return end
+	stop()
+	-- measure the model once
+	local probe = MB.Pet(name)
+	local saddle = probe.model:GetAttribute("Saddle") or 4
+	local scale = probe.scale
+	probe.model:Destroy()
+	local a = {hum = hum, hip = hum.HipHeight, kind = pet.kind, scale = scale}
+	active = a
+	S.sfx("Mount", 0.8, 0.8)
+	UI.flash(Color3.fromRGB(255, 230, 150), 0.6)
+	S.shakeAmp = math.max(S.shakeAmp, 0.5)
+	player.CameraMaxZoomDistance = 500
+	player.CameraMinZoomDistance = math.min(30 + scale * 4, 90)
+	UI.showRide(true, pet.kind == "Dragon")
+	if pet.kind == "Dino" then
+		local r15 = hum.RigType == Enum.HumanoidRigType.R15
+		hum.HipHeight = saddle + (r15 and 2 or 0)
+		hum.WalkSpeed = 26
+		hum.JumpHeight = 0
+		hum.JumpPower = 0
+		hrp.CFrame = hrp.CFrame + Vector3.new(0, saddle, 0)
+		RunService:BindToRenderStep("BBRide", Enum.RenderPriority.Camera.Value - 1, function() end)
+	else
+		controls = controls or getControls()
+		hum.PlatformStand = true
+		hrp.CFrame = hrp.CFrame + Vector3.new(0, 6 + scale, 0)
+		local att = Instance.new("Attachment") att.Parent = hrp
+		local lv = Instance.new("LinearVelocity")
+		lv.Attachment0 = att
+		lv.MaxForce = math.huge
+		lv.VelocityConstraintMode = Enum.VelocityConstraintMode.Vector
+		lv.RelativeTo = Enum.ActuatorRelativeTo.World
+		lv.VectorVelocity = Vector3.zero
+		lv.Parent = hrp
+		local ao = Instance.new("AlignOrientation")
+		ao.Mode = Enum.OrientationAlignmentMode.OneAttachment
+		ao.Attachment0 = att
+		ao.MaxTorque = math.huge
+		ao.Responsiveness = 14
+		ao.RigidityEnabled = false
+		ao.Parent = hrp
+		a.att, a.lv, a.ao = att, lv, ao
+		local vel = Vector3.zero
+		local yaw = math.atan2(-hrp.CFrame.LookVector.X, -hrp.CFrame.LookVector.Z)
+		RunService:BindToRenderStep("BBRide", Enum.RenderPriority.Camera.Value - 1, function(dt)
+			if not active or not hrp.Parent then return end
+			local mv = controls and controls:GetMoveVector() or Vector3.zero
+			local cf = camera.CFrame
+			local dir = cf.LookVector * (-mv.Z) + cf.RightVector * mv.X
+			local up = (UIS:IsKeyDown(Enum.KeyCode.Space) or upHeld) and 1 or ((UIS:IsKeyDown(Enum.KeyCode.LeftShift) or downHeld) and -1 or 0)
+			dir = dir + Vector3.new(0, up * 0.8, 0)
+			local speed = 70 + scale * 1.5
+			local target = Vector3.zero
+			if dir.Magnitude > 0.05 then target = dir.Unit * speed * math.min(dir.Magnitude, 1) end
+			vel = vel:Lerp(target, 1 - math.exp(-dt * 2.6))
+			lv.VectorVelocity = vel
+			if vel.Magnitude > 8 then
+				ao.CFrame = CFrame.lookAt(Vector3.zero, vel.Unit)
+				yaw = math.atan2(-vel.X, -vel.Z)
+			else
+				ao.CFrame = CFrame.Angles(0, yaw, 0)
+			end
+		end)
+	end
+end
+
+player:GetAttributeChangedSignal("Riding"):Connect(function()
+	local n = player:GetAttribute("Riding")
+	if n then start(n) else stop() end
+end)
+player.CharacterRemoving:Connect(stop)
+
+UIS.InputBegan:Connect(function(input, gp)
+	if gp then return end
+	if input.KeyCode == Enum.KeyCode.F and player:GetAttribute("Riding") then
+		S.invoke("Ride", "")
+	end
+end)
+
+return Ride
+]]></ProtectedString></Properties></Item></Item></Item></Item></roblox>
